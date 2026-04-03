@@ -383,7 +383,7 @@ main{position:relative;z-index:1}
         <div style="font-size:13px">Voting as <strong style="color:var(--acc)" id="vdisp"></strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
           <div class="pw"><div class="pf" id="pf" style="width:0%"></div></div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/12</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/13</span>
         </div>
         <button class="btn bg2 bsm" onclick="viewResults()">Results</button>
       </div>
@@ -449,16 +449,17 @@ main{position:relative;z-index:1}
     </div>
     <div class="sp on" id="sp-charter">
       <div class="cb2"><h3>Structure</h3><p>12–14 teams · Sleeper · Dynasty · TEP scoring · $50/year · 2-year upfront</p></div><div class="div"></div>
-      <div class="cb2"><h3>Roster</h3><ul><li>Starters: 1 QB, 2 RB, 3 WR, 1 TE, 2 FLEX = 9 total</li><li>Full: 9 + 12 bench + 3 taxi + 2 IR = 26</li><li>Taxi: rookies and Year 2 only</li></ul></div><div class="div"></div>
+      <div class="cb2"><h3>Roster</h3><ul><li>Starters: 1 QB, 2 RB, 3 WR, 1 TE, 2 FLEX = 9 (14-team) or 10 (12-team, +1 Flex)</li><li>Full: 9 starters (14-team) or 10 (12-team) + bench + 5 taxi + 5 IR</li><li>Taxi: 5 spots default · rookies and Year 2 only</li></ul></div><div class="div"></div>
       <div class="cb2"><h3>Drafts</h3><ul><li>Startup: snake, random lottery order</li><li>Rookie: 3 rounds, MaxPF seeding for non-playoff teams</li><li>Picks tradeable up to 3 years; min 1 pick per round in next 2 drafts</li></ul></div><div class="div"></div>
-      <div class="cb2"><h3>FAAB &amp; Trades</h3><ul><li>$100 FAAB · resets at training camp and offseason</li><li>Auto-approve trades · no veto · no trade deadline</li><li>Playoff teams can only trade with other playoff teams</li></ul></div><div class="div"></div>
+      <div class="cb2"><h3>FAAB &amp; Trades</h3><ul><li>$100 FAAB · resets at training camp and offseason</li><li>Auto-approve trades · no veto · playoff trade restriction applies</li><li>Playoff teams can only trade with other playoff teams</li></ul></div><div class="div"></div>
       <div class="cb2"><h3>Lineup Penalties</h3><ul><li>1st: Warning · 2nd: $5 · 3rd: $10 · 4th: $20 · 5th: $40 FAAB</li><li>6th+: $40 FAAB + loss of lowest rookie pick</li><li>Resets each season</li></ul></div>
     </div>
     <div class="sp" id="sp-payouts">
-      <div class="pcg">
-        <div class="pc"><div class="pci">🥇</div><div class="pcp">~50%</div><div class="pcl">Champion · ~$300 (12 teams)</div></div>
-        <div class="pc"><div class="pci">🥈</div><div class="pcp">~25%</div><div class="pcl">Runner-Up · ~$150</div></div>
-        <div class="pc"><div class="pci">🥉</div><div class="pcp">~15%</div><div class="pcl">3rd / Consolation · ~$90</div></div>
+      <div class="pcg" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+        <div class="pc"><div class="pci">🏆</div><div class="pcp">50%</div><div class="pcl">Champion · ~$300 (12) / $350 (14)</div></div>
+        <div class="pc"><div class="pci">🥈</div><div class="pcp">25%</div><div class="pcl">Runner-Up · ~$150 (12) / $175 (14)</div></div>
+        <div class="pc"><div class="pci">🥉</div><div class="pcp">15%</div><div class="pcl">3rd Place · ~$90 (12) / $105 (14)</div></div>
+        <div class="pc"><div class="pci">📅</div><div class="pcp">10%</div><div class="pcl">Regular Season Winner · best record</div></div>
       </div>
       <div class="card"><div class="ch"><div class="ct">Fee Collection Table</div></div><div class="cb tbl-wrap"><div id="feetbl"></div></div></div>
     </div>
@@ -677,7 +678,7 @@ main{position:relative;z-index:1}
       <div class="ch"><div class="ct">Charter Summary</div></div>
       <div class="cb">
         <div class="cb2"><h3>Key Rules at a Glance</h3>
-          <ul><li>12–14 teams · Dynasty · Sleeper · TEP scoring</li><li>$50/year · 2-year upfront ($100 to join)</li><li>9 starters + 12 bench + 3 taxi + 2 IR = 26 total</li><li>3-round rookie draft · MaxPF seeding</li><li>$100 FAAB · resets training camp + offseason</li><li>Auto-approve trades · no veto · no deadline</li><li>Lineup penalty escalates: warning → $5 → $10 → $20 → $40 → draft pick</li></ul>
+          <ul><li>12–14 teams · Dynasty · Sleeper · Full PPR + 0.5 TEP</li><li>CAD $55/year ($50 base + $5 operational) · 2 years upfront (CAD $110)</li><li>9 starters (14-team) or 10 starters (12-team) + bench + 5 taxi + 5 IR</li><li>3-round rookie draft · linear order · MaxPF seeding</li><li>CAD $100 FAAB · resets training camp + offseason</li><li>Auto-approve trades · no veto · playoff restriction applies</li><li>Lineup penalty escalates: warning → $10 → $20 → $40 → remaining FAAB + pick</li><li>Prize pool: 50% champion · 25% runner-up · 15% 3rd · 10% regular season winner (best record)</li><li>Payment: E-Transfer to rkunka31@gmail.com</li></ul>
         </div>
       </div>
     </div>
@@ -781,8 +782,27 @@ main{position:relative;z-index:1}
 <div id="toast"></div>
 <script>// THE COMBINE — App Logic
 // ═══════════════════════════════════════════
-const LEAGUE_ID = '1180200578712662016';
+const LEAGUE_ID = '1315912688991227904';
 const WORKER_URL = localStorage.getItem('combine_worker') || '';
+
+// AI proxy — routes through Cloudflare Worker so the API key stays secret
+async function aiCall(system, userMsg, maxTokens=1000) {
+  const endpoint = WORKER_URL ? WORKER_URL+'/ai' : 'https://api.anthropic.com/v1/messages';
+  const headers = {'Content-Type':'application/json'};
+  if (!WORKER_URL) headers['x-api-key'] = '';  // direct calls need key — won't work without worker
+  const r = await fetch(endpoint, {
+    method:'POST',
+    headers,
+    body: JSON.stringify({
+      model:'claude-opus-4-5',
+      max_tokens: maxTokens,
+      system,
+      messages:[{role:'user',content:userMsg}]
+    })
+  });
+  const d = await r.json();
+  return d.content?.[0]?.text || '';
+}
 const PAY_YEARS = [2026,2027,2028];
 
 // ═══ STORAGE ═══════════════════════════════
@@ -1163,18 +1183,19 @@ function confirmClearAll(){
 
 // ═══ SURVEY ═════════════════════════════════
 const QS=[
-  {id:'q1',t:'Trade veto system',s:'Beyond collusion review, should there be a veto?',o:['No veto — auto-approve (chartered)','Commissioner-only veto on extreme cases','48-hr league veto window (majority kills)']},
-  {id:'q2',t:'Taxi squad size',s:'How many taxi spots?',o:['3 spots (chartered)','4 spots','5 spots']},
-  {id:'q3',t:'Taxi eligibility',s:'Who qualifies?',o:['Rookies + Year 2 (chartered)','Rookies only','Rookies + Year 2 + Year 3']},
-  {id:'q4',t:'Rookie draft rounds',s:'Annual rookie draft length?',o:['3 rounds (chartered)','4 rounds','5 rounds']},
-  {id:'q5',t:'FAAB reset frequency',s:'When does FAAB reset?',o:['Training camp + offseason 2x (chartered)','Offseason only','Three times — camp, offseason, post-rookie draft']},
-  {id:'q6',t:'Startup format',s:'How do we draft at startup?',o:['Snake, random lottery (chartered)','Linear repeating','Auction with FAAB budget']},
-  {id:'q7',t:'IR spots',s:'How many IR slots?',o:['2 spots (chartered)','1 spot','3 spots']},
-  {id:'q8',t:'Playoff teams',s:'How many qualify? (12-team)',o:['4 teams','6 teams','8 teams']},
-  {id:'q9',t:'Passing TD value',s:'Points per passing TD?',o:['4 pts standard (chartered)','6 pts QB-friendly','4 pts + 300-yard bonus']},
-  {id:'q10',t:'TEP bonus',s:'Tight End Premium per reception?',o:['+0.5 pts (chartered)','+1.0 pt','+0.25 pts']},
-  {id:'q11',t:'First lineup offense',s:'Penalty for first invalid lineup?',o:['Warning only (chartered)','$5 FAAB immediately','Warning + escalated 2nd offense']},
-  {id:'q12',t:'Pick trade window',s:'How far out can picks be traded?',o:['3 years (chartered)','2 years only','Unlimited']},
+  {id:'q1',t:'Team count',s:'How many teams in the league?',o:['12 teams','14 teams']},
+  {id:'q2',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper?',o:['Sleeper chat only (default)','GroupMe group text','Email chain','Other — Commissioner decides']},
+  {id:'q3',t:'Annual entry fee',s:'Confirm or adjust the annual entry fee.',o:['CAD $55/year as chartered ($50 base + $5 operational)','Vote to adjust amount at Season 1 meeting']},
+  {id:'q4',t:'Prize pool distribution',s:'How should the prize pool be split? (Pool = $50 base x teams)',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner — chartered','Propose alternative at Season 1 meeting']},
+  {id:'q5',t:'Active lineup configuration',s:'How many starters per team?',o:['9 starters — 14-team league (chartered)','10 starters — 12-team league with extra Flex (chartered)','Vote to change lineup slots']},
+  {id:'q6',t:'Taxi squad size',s:'How many taxi spots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q7',t:'IR spots',s:'How many IR slots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q8',t:'Scoring format & TEP',s:'Confirm scoring and tight end premium per the charter.',o:['Full PPR + 0.5 TEP per TE reception — chartered','Full PPR + 0.25 TEP per TE reception','Full PPR + 1.0 TEP per TE reception']},
+  {id:'q9',t:'Rookie draft rounds',s:'How many rounds in the annual rookie draft?',o:['3 rounds — chartered default','4 rounds','5 rounds']},
+  {id:'q10',t:'FAAB budget',s:'How much FAAB per team per period?',o:['CAD $100 per period — chartered','Vote to adjust amount']},
+  {id:'q11',t:'Trade deadline policy',s:'Should there be a trade deadline?',o:['Option A — No deadline: trades allowed all year; non-playoff teams cannot trade with playoff teams during playoffs (chartered default)','Option B — Standard deadline: trades cut off 2 weeks before playoffs; off-season trading reopens after championship']},
+  {id:'q12',t:'Trade veto system',s:'Should owners be able to veto trades?',o:['No veto — auto-approve; Commissioner reviews collusion only (chartered)','Commissioner-only veto on extreme cases','48-hour league veto (majority vote kills the trade)']},
+  {id:'q13',t:'Playoff field size',s:'How many teams make the playoffs?',o:['4 teams','6 teams — recommended','8 teams']},
 ];
 let vname=localStorage.getItem('combine_voter')||'', myans={};
 
@@ -1511,8 +1532,8 @@ async function genRoast(mid,t1name,s1,t2name,s2,style,rid1,rid2){
     :'Fantasy football reporter for The Combine. 2-sentence factual recap. Reference team names specifically. Under 60 words.';
   const ctx=`${winner} defeated ${loser}. Score: ${wp}–${lp}. Margin: ${mg}.${winCtx?` Winner context: ${winCtx}.`:''}${loseCtx?` Loser context: ${loseCtx}.`:''}`;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:ctx}]})});
-    const d=await r.json(); el.textContent=d.content?.[0]?.text||'No response.'; el.classList.add('ld');
+    const text = await aiCall(sys, ctx);
+    el.textContent = text || 'No response.'; el.classList.add('ld');
   }catch{ el.textContent=`${winner} put up ${wp} to beat ${loser}'s ${lp}. A ${mg}-point margin.`; el.classList.add('ld'); }
 }
 
@@ -1786,8 +1807,7 @@ async function genSmack(){
   const prompt=`Write dynasty fantasy football smack talk from "${from}" directed at "${target}".\nTone: ${tones[tone]}.\nContext: ${reasons[reason]}.${leagueContext}\n\nIMPORTANT: Reference specific details (records, players, scores) when available. Write 2-4 punchy, varied sentences. Make it feel personal to THESE specific teams, not generic. No hashtags. Make it memorable and different every time — vary the structure, humor style, and angle.`;
 
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You write sharp, varied dynasty fantasy football smack talk. Each response must be meaningfully different in structure and angle. Use specific player names, records, and team details when provided.',messages:[{role:'user',content:prompt}]})});
-    const d=await r.json(); lastSmack=d.content?.[0]?.text||'Your lineup says it all.';
+    lastSmack = await aiCall('You write sharp, varied dynasty fantasy football smack talk. Each response must be meaningfully different in structure and angle. Use specific player names, records, and team details when provided.', prompt) || 'Your lineup says it all.';
   }catch{ lastSmack=`${target}, the scoreboard doesn't lie. ${from} doesn't either.`; }
   box.textContent=lastSmack; document.getElementById('smacts').style.display='flex';
 }
