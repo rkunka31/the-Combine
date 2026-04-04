@@ -452,7 +452,7 @@ main{position:relative;z-index:1}
         <div style="font-size:13px">Voting as <strong style="color:var(--acc)" id="vdisp"></strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
           <div class="pw"><div class="pf" id="pf" style="width:0%"></div></div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/10</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/11</span>
         </div>
         <button class="btn bg2 bsm" onclick="viewResults()">Results</button>
       </div>
@@ -489,7 +489,7 @@ main{position:relative;z-index:1}
     </div>
     <div class="card tbl-wrap">
       <table class="rtbl"><thead><tr>
-        <th>Owner Name</th><th>Team</th><th>Email</th><th>Phone</th>
+        <th>Team (Sleeper)</th><th>Owner Real Name</th><th>Email</th><th>Phone</th>
         <th style="text-align:center">2026</th><th style="text-align:center">2027</th><th style="text-align:center">2028</th><th></th>
       </tr></thead><tbody id="rb"></tbody></table>
     </div>
@@ -1344,7 +1344,8 @@ function confirmClearAll(){
 const QS=[
   // All rules assume a 14-team league. If fewer than 14 teams join, some rules may be adjusted by Commissioner vote.
   {id:'q1',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper? (14-team league assumed)',o:['Sleeper chat only (default)','WhatsApp group','Email chain','Other — Commissioner decides']},
-  {id:'q2',t:'Annual entry fee',s:'Choose the annual base fee per team. All options add a CAD $5 operational fee on top. Assumes 14 teams; adjustments may apply if final count differs.',o:['CAD $50 base + $5 = $55/year total','CAD $75 base + $5 = $80/year total','CAD $100 base + $5 = $105/year total']},
+  {id:'q2',t:'Annual entry fee — preferred amount',s:'What is your preferred annual base fee? (+ CAD $5 operational on top). Assumes 14 teams.',o:['CAD $50 base + $5 = $55/year ($110 upfront)','CAD $75 base + $5 = $80/year ($160 upfront)','CAD $100 base + $5 = $105/year ($210 upfront)']},
+  {id:'q2b',t:'Annual entry fee — your hard limit',s:'What is the MAXIMUM you are willing to pay per year? Select ALL amounts you are comfortable with. If the league votes above your limit, you may need to reconsider your spot.',multi:true,o:['Up to $55/year ($110 upfront) — I cannot go higher','Up to $80/year ($160 upfront) — comfortable with this','Up to $105/year ($210 upfront) — comfortable with this','No limit — happy with whatever the league decides']},
   {id:'q3',t:'Prize pool distribution',s:'How should the prize pool be split? Based on 14 teams; proportions scale automatically with final team count.',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner','60% champion / 20% runner-up / 10% 3rd place / 10% regular season winner','Propose alternative at Season 1 meeting']},
   {id:'q4',t:'Taxi squad size',s:'How many taxi spots per team? (14-team league)',o:['3 spots','5 spots — chartered default','10 spots']},
   {id:'q5',t:'IR spots',s:'How many IR slots per team? (14-team league)',o:['3 spots','5 spots — chartered default','10 spots']},
@@ -1413,7 +1414,12 @@ function updProg(){
 
 async function submitSurvey(){
   const all=DB.get('votes',{}); all[vname]={...myans,ts:Date.now()};
-  await DB.set('votes',all); toast('Votes submitted!'); renderSurveyResults(); viewResults();
+  await DB.set('votes',all);
+  toast('Votes submitted!');
+  // Hide the question form, show only results
+  document.getElementById('sbody').style.display='none';
+  document.getElementById('sg').style.display='none';
+  renderSurveyResults();
 }
 
 function viewResults(){
@@ -1449,9 +1455,13 @@ function viewResults(){
 updateSurveyGate();
 if(currentUser){
   const existingVote = DB.get('votes',{})[currentUser.team_name];
-  if(existingVote){ vname=currentUser.team_name; myans=existingVote; document.getElementById('sg').style.display='none'; document.getElementById('sbody').style.display='block'; document.getElementById('vdisp').textContent=vname; renderQs(); }
+  if(existingVote){
+    // Already voted — hide form entirely, show results only
+    vname=currentUser.team_name; myans=existingVote;
+    document.getElementById('sg').style.display='none';
+    document.getElementById('sbody').style.display='none';
+  }
 } else if(vname){
-  // Legacy: had a name saved, show gate with prompt to log in properly
   updateSurveyGate();
 }
 
@@ -1514,7 +1524,7 @@ async function delOwner(i){
 
 function renderFeeTable(){
   const r=DB.get('roster',[]); const el=document.getElementById('feetbl'); if(!el) return;
-  el.innerHTML=`<table class="rtbl" style="min-width:400px"><thead><tr><th>Owner Name</th><th>Team</th>${PAY_YEARS.map(y=>`<th style="text-align:center">${y}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead><tbody>
+  el.innerHTML=`<table class="rtbl" style="min-width:400px"><thead><tr><th>Team (Sleeper)</th><th>Owner</th>${PAY_YEARS.map(y=>`<th style="text-align:center">${y}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead><tbody>
     ${r.map(o=>{const t=PAY_YEARS.filter(y=>o.pay?.[y]==='yes').length*50;return`<tr><td style="font-weight:600">${o.name}</td><td style="color:var(--acc)">${o.team||'—'}</td>${PAY_YEARS.map(y=>`<td style="text-align:center">${ph(o.pay?.[y]||'no')}</td>`).join('')}<td style="text-align:center;font-weight:700;color:var(--em)">$${t}</td></tr>`;}).join('')}
   </tbody></table>`;
 }
