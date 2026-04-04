@@ -2005,22 +2005,31 @@ async function delRuling(i){ if(!confirm('Remove?'))return; const d=DB.get('ruli
 
 // ═══ CHARTER UPLOAD ══════════════════════════
 async function renderCharter(){
-  // Pull charter data from KV if not in localStorage
-  const localData=localStorage.getItem('combine_charter_data');
-  if(!localData){
-    const kvData=DB.get('charter_data',null);
-    if(kvData) localStorage.setItem('combine_charter_data',kvData);
-  }
-  const meta=DB.get('charter_meta',null);
   const el=document.getElementById('charter-content');
+  if(!el) return;
+
+  // Always fetch meta from KV first — source of truth
+  let meta = null;
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=charter_meta');
+      if(r.ok){ const d=await r.json(); if(d.value) meta=d.value; }
+    }catch{}
+  }
+  // Fall back to localStorage
+  if(!meta) meta = DB.get('charter_meta',null);
+
   if(meta){
+    // Check if we have the file data locally already
+    const hasLocal = !!localStorage.getItem('combine_charter_data');
     el.innerHTML=`<div class="card" style="padding:20px;text-align:center">
       <div style="font-size:40px;margin-bottom:10px">📄</div>
       <div style="font-family:var(--serif);font-size:18px;color:var(--bone);margin-bottom:5px">${meta.name}</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Uploaded ${new Date(meta.ts).toLocaleDateString()} · ${(meta.size/1024).toFixed(1)} KB</div>
+      <div id="charter-dl-status" style="font-size:12px;color:var(--muted);margin-bottom:10px">${hasLocal?'':'Tap Download to fetch from server.'}</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button class="btn ba2" onclick="downloadCharter()">⬇️ Download Charter</button>
-        <button class="btn bd bsm" onclick="removeCharter()">Remove</button>
+        ${adminUnlocked?`<button class="btn bd bsm" onclick="removeCharter()">Remove</button>`:''}
       </div>
     </div>`;
   } else {
@@ -2047,15 +2056,41 @@ function uploadCharter(e){
   reader.readAsDataURL(file);
 }
 
-function downloadCharter(){
-  const data=localStorage.getItem('combine_charter_data');
-  if(!data){
-    // Try pulling from KV
-    const kvData=DB.get('charter_data',null);
-    if(kvData){ localStorage.setItem('combine_charter_data',kvData); downloadCharter(); return; }
-    toast('Charter not found. Try re-uploading.'); return;
+async function downloadCharter(){
+  const statusEl = document.getElementById('charter-dl-status');
+  if(statusEl) statusEl.textContent = 'Fetching charter…';
+
+  let data = localStorage.getItem('combine_charter_data');
+
+  // If not in localStorage, fetch the file data from KV
+  if(!data && WORKER_URL){
+    try{
+      if(statusEl) statusEl.textContent = 'Downloading from server…';
+      const r = await fetch(WORKER_URL+'/get?key=charter_data');
+      if(r.ok){
+        const d = await r.json();
+        if(d.value){
+          data = d.value;
+          localStorage.setItem('combine_charter_data', data);
+        }
+      }
+    }catch(e){ console.error('KV charter fetch failed', e); }
   }
-  const meta=DB.get('charter_meta',{name:'The_Combine_Charter.docx'});
+
+  if(!data){
+    if(statusEl) statusEl.textContent = 'Charter not found. Ask the commissioner to re-upload.';
+    toast('Charter not available. Try again or ask the commissioner.'); return;
+  }
+
+  if(statusEl) statusEl.textContent = '';
+  let meta = null;
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=charter_meta');
+      if(r.ok){ const d=await r.json(); if(d.value) meta=d.value; }
+    }catch{}
+  }
+  if(!meta) meta = DB.get('charter_meta',{name:'The_Combine_Charter.docx'});
   try{
     // Convert base64 data URL to Blob for reliable download
     const arr=data.split(',');
