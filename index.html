@@ -832,7 +832,10 @@ main{position:relative;z-index:1}
             <strong style="color:var(--bone)">Restore:</strong> Upload any backup file. Preview exactly what is in it and choose which sections to restore. Existing data for selected keys is overwritten.
           </div>
           <div style="margin-bottom:14px">
-            <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Current Data Snapshot</div>
+            <!-- Survey vote management -->
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:8px;margin-top:0">Survey Vote Management</div>
+          <div id="admin-votes-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Current Data Snapshot</div>
             <div id="data-snapshot" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px"></div>
           </div>
           <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px">
@@ -944,7 +947,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 // ═══════════════════════════════════════════
 const LEAGUE_ID = '1315912688991227904';
-const WORKER_URL = localStorage.getItem('combine_worker') || '';
+const WORKER_URL = localStorage.getItem('combine_worker') || 'https://the-combine.rkunka31.workers.dev';
 
 // AI proxy — routes through Cloudflare Worker so the API key stays secret
 async function aiCall(system, userMsg, maxTokens=1000) {
@@ -1211,6 +1214,48 @@ function renderAdmin(){
         title="${vis[t]!==false?'Visible':'Hidden'}"></button>
     </div>`).join('');
   renderDataSnapshot();
+  renderAdminVotes();
+}
+
+function renderAdminVotes(){
+  const el = document.getElementById('admin-votes-list');
+  if(!el) return;
+  const votes = DB.get('votes',{});
+  const voters = Object.keys(votes).filter(k=>k!=='_meta');
+  if(!voters.length){
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted);font-style:italic">No votes on record.</span>';
+    return;
+  }
+  el.innerHTML = voters.map(v => {
+    const answered = QS.filter(q=>{
+      const a=votes[v][q.id];
+      return q.multi?Array.isArray(a)&&a.length>0:a!==undefined;
+    }).length;
+    return `<div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:6px;padding:5px 10px">
+      <span style="font-size:12px;color:var(--bone)">${v}</span>
+      <span style="font-size:11px;color:var(--muted)">(${answered}/${QS.length})</span>
+      <button class="btn bd" style="padding:2px 7px;font-size:11px;margin-left:4px" onclick="adminDeleteVote('${v}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function adminDeleteVote(voter){
+  if(!confirm('Delete votes for "' + voter + '"? This cannot be undone.')) return;
+  // Always fetch KV first to get all votes, then delete this entry
+  let all = {};
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=votes');
+      if(r.ok){ const d = await r.json(); if(d.value) all = d.value; }
+    }catch{}
+  }
+  const local = DB.get('votes',{});
+  Object.assign(all, local);
+  delete all[voter];
+  await DB.set('votes', all);
+  renderAdminVotes();
+  renderDataSnapshot();
+  toast(voter + ' votes removed.');
 }
 
 const DATA_KEYS=['roster','messages','votes','tradeblock','rulings','history','penalties','smacklog','charter_meta','charter_data','tab_visibility'];
@@ -2206,9 +2251,15 @@ async function renderSurveyResults(){
       if(r.ok){
         const d = await r.json();
         if(d.value){
-          // Merge KV votes into localStorage so local is up to date
+          // KV is source of truth — it has everyone's votes
+          // Only preserve local vote if it's newer than what's in KV
           const local = DB.get('votes',{});
-          const merged = {...d.value, ...local};
+          const merged = {...local, ...d.value}; // KV wins for others
+          // Keep local version of current voter if it's newer
+          const myKey = currentUser?.team_name || vname || localStorage.getItem('combine_voter');
+          if(myKey && local[myKey] && (!d.value[myKey] || local[myKey].ts >= d.value[myKey].ts)){
+            merged[myKey] = local[myKey];
+          }
           localStorage.setItem('combine_votes', JSON.stringify(merged));
         }
       }
@@ -2326,7 +2377,7 @@ async function renderSurveyResults(){
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              ${isMe?`<button class="btn bd bsm" onclick="event.stopPropagation();deleteMySurvey('${v}')" style="font-size:11px;padding:3px 8px">Remove</button>`:''}
+              ${(isMe||adminUnlocked)?`<button class="btn bd bsm" onclick="event.stopPropagation();deleteMySurvey('${v}')" style="font-size:11px;padding:3px 8px">${isMe?'Remove':'🗑️'}</button>`:''}
               <span id="vtile-arrow-${v.replace(/\s/g,'_')}" style="color:var(--muted);font-size:12px;transition:transform .2s">▼</span>
             </div>
           </div>
