@@ -310,6 +310,15 @@ main{position:relative;z-index:1}
   border-radius:50%;background:var(--muted);transition:all .2s}
 .toggle-sw.on{background:rgba(39,174,116,.3)}.toggle-sw.on::after{left:19px;background:var(--em)}
 
+/* PASSWORD GATE */
+#pw-gate{position:fixed;inset:0;z-index:9999;background:var(--g1);display:flex;align-items:center;justify-content:center;padding:20px}
+.pw-box{background:var(--card);border:1px solid var(--bdra);border-radius:13px;padding:32px 28px;max-width:380px;width:100%;text-align:center}
+.pw-box .logo-gate{font-family:var(--serif);font-size:48px;font-weight:900;color:var(--acc);line-height:1;margin-bottom:6px}
+.pw-box h2{font-family:var(--serif);font-size:22px;color:var(--bone);margin-bottom:6px}
+.pw-box p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.pw-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:8px;padding:12px 15px;color:var(--bone);font-family:var(--sans);font-size:16px;outline:none;text-align:center;letter-spacing:2px;margin-bottom:12px;-webkit-appearance:none}
+.pw-inp:focus{border-color:var(--acc)}
+.pw-err{font-size:12px;color:#e05c4b;margin-bottom:10px;min-height:18px}
 /* RESPONSIVE */
 @media(max-width:768px){
   .hamburger{display:flex}
@@ -330,6 +339,18 @@ main{position:relative;z-index:1}
 </style>
 </head>
 <body>
+<div id="pw-gate">
+  <div class="pw-box">
+    <div class="logo-gate">⚙️</div>
+    <h2>The Combine</h2>
+    <p>Dynasty Football League Hub<br>Enter the league password to continue.</p>
+    <input class="pw-inp" id="pw-inp" type="password" placeholder="Password" maxlength="30"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="pw-err" id="pw-err"></div>
+    <button class="btn ba2" style="width:100%;font-size:15px" onclick="checkPw()">Enter The Combine →</button>
+  </div>
+</div>
+
 <header>
   <div class="logo"><span class="logo-sm">The</span><span class="logo-main">Combine</span></div>
   <nav id="desktop-nav">
@@ -420,16 +441,18 @@ main{position:relative;z-index:1}
   <div class="hero" data-bg="VOTE"><h1>Charter Survey</h1><p>vote · 2/3 majority passes · commissioner reviews the rest</p></div>
   <div class="wrap">
     <div class="sg" id="sg">
-      <h2>Cast Your Vote</h2><p>Enter your name so your vote is tracked. Takes ~3 minutes.</p>
-      <input class="sni" id="vi" placeholder="Your name..." maxlength="40">
-      <button class="btn ba2" style="width:100%" onclick="startSurvey()">Begin Voting →</button>
+      <h2>Cast Your Vote</h2>
+      <p>Log in as your team first, then cast your votes. Takes about 3 minutes.</p>
+      <div id="survey-login-status" style="margin-bottom:14px"></div>
+      <button class="btn ba2" style="width:100%;margin-bottom:8px" onclick="startSurveyAsTeam()">Begin Voting →</button>
+      <button class="btn bg2" style="width:100%;font-size:12px" onclick="openM('login-modal')">Log in as a different team</button>
     </div>
     <div id="sbody" style="display:none">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
         <div style="font-size:13px">Voting as <strong style="color:var(--acc)" id="vdisp"></strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
           <div class="pw"><div class="pf" id="pf" style="width:0%"></div></div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/11</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/10</span>
         </div>
         <button class="btn bg2 bsm" onclick="viewResults()">Results</button>
       </div>
@@ -466,7 +489,7 @@ main{position:relative;z-index:1}
     </div>
     <div class="card tbl-wrap">
       <table class="rtbl"><thead><tr>
-        <th>Owner</th><th>Team</th><th>Email</th><th>Phone</th>
+        <th>Owner Name</th><th>Team</th><th>Email</th><th>Phone</th>
         <th style="text-align:center">2026</th><th style="text-align:center">2027</th><th style="text-align:center">2028</th><th></th>
       </tr></thead><tbody id="rb"></tbody></table>
     </div>
@@ -479,8 +502,8 @@ main{position:relative;z-index:1}
 <div class="ov" id="om">
   <div class="modal"><h2 id="omt">Add / Edit Owner</h2><div class="msub">Update contact info or payment status.</div>
     <div class="g2" style="gap:10px;margin-bottom:12px">
-      <div class="fld"><label>Owner Name *</label><input id="fn" placeholder="Full name"></div>
-      <div class="fld"><label>Team Name</label><input id="ft" placeholder="Team name"></div>
+      <div class="fld"><label>Owner Real Name *</label><input id="fn" placeholder="e.g. Rob Kunka"></div>
+      <div class="fld"><label>Team Name (from Sleeper)</label><input id="ft" placeholder="e.g. The Dark Knights"></div>
       <div class="fld"><label>Email</label><input id="fe" type="email" placeholder="email@example.com"></div>
       <div class="fld"><label>Phone</label><input id="fp" placeholder="(555) 555-5555"></div>
       <div class="fld"><label>2026</label><select id="f2026"><option value="no">✗ Unpaid</option><option value="yes">✓ Paid</option><option value="pending">~ Pending</option></select></div>
@@ -878,6 +901,40 @@ main{position:relative;z-index:1}
 </main>
 <div id="toast"></div>
 <script>// THE COMBINE — App Logic
+// ═══ PASSWORD GATE ═══════════════════════════════════
+const SITE_PW = 'dynasty26';
+const PW_KEY  = 'combine_auth';
+
+function checkPw(){
+  const val = document.getElementById('pw-inp').value.trim().toLowerCase();
+  if(val === SITE_PW){
+    sessionStorage.setItem(PW_KEY, '1');
+    document.getElementById('pw-gate').style.display = 'none';
+    document.getElementById('pw-inp').value = '';
+    initApp();
+  } else {
+    const err = document.getElementById('pw-err');
+    err.textContent = 'Incorrect password. Try again.';
+    document.getElementById('pw-inp').value = '';
+    document.getElementById('pw-inp').focus();
+    setTimeout(()=>{ err.textContent=''; }, 3000);
+  }
+}
+
+// Check auth on load
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(sessionStorage.getItem(PW_KEY) === '1'){
+    document.getElementById('pw-gate').style.display = 'none';
+    initApp();
+  } else {
+    // Hide everything behind the gate
+    document.querySelector('header').style.visibility = 'hidden';
+    document.querySelector('main').style.visibility = 'hidden';
+    document.getElementById('pw-inp').focus();
+  }
+});
+
+
 // ═══════════════════════════════════════════
 const LEAGUE_ID = '1315912688991227904';
 const WORKER_URL = localStorage.getItem('combine_worker') || '';
@@ -974,7 +1031,8 @@ async function syncRosterFromSleeper(){
     const idx=existing.findIndex(o=>o.sleeper_user_id===u.user_id);
     if(idx===-1){
       existing.push({
-        name:u.display_name, team:u.metadata?.team_name||'',
+        name:'', team:u.metadata?.team_name||u.display_name,
+        sleeper_name:u.display_name,
         email:'', phone:'', sleeper_user_id:u.user_id,
         sleeper_roster_id:r.roster_id,
         pay:{2026:'no',2027:'no',2028:'no'}
@@ -1026,12 +1084,14 @@ function loginAs(){
   updateUserPill();
   toast('Logged in as '+currentUser.team_name+'!');
   renderTradeBlock();
+  updateSurveyGate();
 }
 
 function logout(){
   currentUser=null;
   localStorage.removeItem('combine_current_user');
   updateUserPill();
+  updateSurveyGate();
   toast('Logged out.');
 }
 
@@ -1282,28 +1342,46 @@ function confirmClearAll(){
 
 // ═══ SURVEY ═════════════════════════════════
 const QS=[
-  {id:'q1',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper?',o:['Sleeper chat only (default)','GroupMe group text','Email chain','Other — Commissioner decides']},
-  {id:'q2',t:'Annual entry fee',s:'Choose the annual base fee per team. All options include the CAD $5 operational fee on top.',o:['CAD $50 base + $5 operational = $55/year total','CAD $75 base + $5 operational = $80/year total','CAD $100 base + $5 operational = $105/year total']},
-  {id:'q3',t:'Prize pool distribution',s:'How should the prize pool be split? (Pool = base fee x 14 teams)',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner','60% champion / 20% runner-up / 10% 3rd place / 10% regular season winner','Propose alternative at Season 1 meeting']},
-  {id:'q4',t:'Taxi squad size',s:'How many taxi spots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
-  {id:'q5',t:'IR spots',s:'How many IR slots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
-  {id:'q6',t:'Scoring format & TEP',s:'Confirm scoring and tight end premium per the charter.',o:['Full PPR + 0.5 TEP per TE reception — chartered','Full PPR + 0.25 TEP per TE reception','Full PPR + 1.0 TEP per TE reception']},
-  {id:'q7',t:'Rookie draft rounds',s:'How many rounds in the annual rookie draft?',o:['3 rounds — chartered default','4 rounds','5 rounds']},
-  {id:'q8',t:'FAAB budget',s:'How much FAAB per team per period?',o:['CAD $100 per period — chartered','CAD $200 per period','Vote to adjust amount']},
-  {id:'q9',t:'Trade deadline policy',s:'Should there be a trade deadline?',o:['Option A — No deadline: trades allowed all year; non-playoff teams cannot trade with playoff teams during playoffs (chartered default)','Option B — Standard deadline: trades cut off 2 weeks before playoffs; off-season trading reopens after championship']},
-  {id:'q10',t:'Trade veto system',s:'Should owners be able to veto trades?',o:['No veto — auto-approve; Commissioner reviews collusion only (chartered)','Commissioner-only veto on extreme cases','48-hour league veto (majority vote kills the trade)']},
-  {id:'q11',t:'Playoff field size',s:'How many teams make the playoffs? (14-team league)',o:['4 teams','6 teams — recommended','8 teams']},
+  // All rules assume a 14-team league. If fewer than 14 teams join, some rules may be adjusted by Commissioner vote.
+  {id:'q1',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper? (14-team league assumed)',o:['Sleeper chat only (default)','WhatsApp group','Email chain','Other — Commissioner decides']},
+  {id:'q2',t:'Annual entry fee',s:'Choose the annual base fee per team. All options add a CAD $5 operational fee on top. Assumes 14 teams; adjustments may apply if final count differs.',o:['CAD $50 base + $5 = $55/year total','CAD $75 base + $5 = $80/year total','CAD $100 base + $5 = $105/year total']},
+  {id:'q3',t:'Prize pool distribution',s:'How should the prize pool be split? Based on 14 teams; proportions scale automatically with final team count.',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner','60% champion / 20% runner-up / 10% 3rd place / 10% regular season winner','Propose alternative at Season 1 meeting']},
+  {id:'q4',t:'Taxi squad size',s:'How many taxi spots per team? (14-team league)',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q5',t:'IR spots',s:'How many IR slots per team? (14-team league)',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q6',t:'Scoring format & TEP',s:'Confirm scoring and tight end premium. These settings apply regardless of final team count.',o:['Full PPR + 0.5 TEP per TE reception — chartered','Full PPR + 0.25 TEP per TE reception','Full PPR + 1.0 TEP per TE reception']},
+  {id:'q7',t:'Rookie draft rounds',s:'How many rounds in the annual rookie draft? (14-team league default)',o:['3 rounds — chartered default','4 rounds','5 rounds']},
+  {id:'q8',t:'Trade deadline policy',s:'Should there be a trade deadline? (applies regardless of team count)',o:['Option A — No deadline: trades allowed all year; non-playoff teams cannot trade with active playoff teams (chartered default)','Option B — Standard deadline: trades cut off 2 weeks before playoffs; off-season trading reopens after championship']},
+  {id:'q9',t:'Trade veto system',s:'How should trades be reviewed?',o:['No veto; auto-approve. Commissioner reviews collusion only — no league vote.','No veto; auto-approve. Commissioner review and league vote in extreme cases.','Automatic 48-hour league veto window — majority vote kills the trade.']},
+  {id:'q10',t:'Playoff field size',s:'How many teams make the playoffs? (14-team league)',o:['4 teams','6 teams — recommended','8 teams']},
 ];
 let vname=localStorage.getItem('combine_voter')||'', myans={};
 
-function startSurvey(){
-  const n=document.getElementById('vi').value.trim(); if(!n){toast('Enter your name first.');return;}
-  vname=n; localStorage.setItem('combine_voter',n);
-  myans=(DB.get('votes',{})[n])||{};
+function startSurveyAsTeam(){
+  // Must be logged in as a team to vote
+  if(!currentUser){ toast('Log in as your team first.'); openM('login-modal'); return; }
+  const n = currentUser.team_name;
+  vname = n; localStorage.setItem('combine_voter', n);
+  myans = (DB.get('votes',{})[n])||{};
   document.getElementById('sg').style.display='none';
   document.getElementById('sbody').style.display='block';
-  document.getElementById('vdisp').textContent=n;
+  document.getElementById('vdisp').textContent = n;
   renderQs();
+}
+// Keep old startSurvey for compatibility
+function startSurvey(){ startSurveyAsTeam(); }
+
+function updateSurveyGate(){
+  const el = document.getElementById('survey-login-status');
+  if(!el) return;
+  if(currentUser){
+    el.innerHTML = `<div style="background:rgba(39,174,116,.1);border:1px solid rgba(39,174,116,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--em)">
+      ✓ Logged in as <strong>${currentUser.team_name}</strong> (${currentUser.display_name}) — ready to vote.
+    </div>`;
+  } else {
+    el.innerHTML = `<div style="background:rgba(200,169,110,.08);border:1px solid var(--bdra);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted)">
+      You need to log in as your team before voting. Tap below to select your team.
+    </div>`;
+  }
 }
 
 function renderQs(){
@@ -1364,7 +1442,15 @@ function viewResults(){
   openM('resm');
 }
 
-if(vname){ document.getElementById('sg').style.display='none'; document.getElementById('sbody').style.display='block'; document.getElementById('vdisp').textContent=vname; myans=(DB.get('votes',{})[vname])||{}; renderQs(); }
+// If already logged in as a team and already voted, go straight to survey body
+updateSurveyGate();
+if(currentUser){
+  const existingVote = DB.get('votes',{})[currentUser.team_name];
+  if(existingVote){ vname=currentUser.team_name; myans=existingVote; document.getElementById('sg').style.display='none'; document.getElementById('sbody').style.display='block'; document.getElementById('vdisp').textContent=vname; renderQs(); }
+} else if(vname){
+  // Legacy: had a name saved, show gate with prompt to log in properly
+  updateSurveyGate();
+}
 
 // ═══ ROSTER ══════════════════════════════════
 const ph=s=>s==='yes'?`<span class="pi py">✓</span>`:s==='pending'?`<span class="pi pp">~</span>`:`<span class="pi pn">✗</span>`;
@@ -1374,8 +1460,8 @@ function renderRoster(){
   document.getElementById('rb').innerHTML=r.length===0
     ?`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Loading from Sleeper... If this persists, owners will be added automatically when you connect.</td></tr>`
     :r.map((o,i)=>`<tr>
-        <td style="font-weight:600">${o.name}</td>
-        <td style="color:var(--acc)">${o.team||'—'}</td>
+        <td style="font-weight:600">${o.name||'<span style="color:var(--muted);font-style:italic;font-weight:400">Not set</span>'}</td>
+        <td style="color:var(--acc)">${o.team||o.sleeper_name||'—'}</td>
         <td style="color:var(--muted);font-size:12px">${o.email||'—'}</td>
         <td style="color:var(--muted);font-size:12px">${o.phone||'—'}</td>
         ${PAY_YEARS.map(y=>`<td style="text-align:center">${ph(o.pay?.[y]||'no')}</td>`).join('')}
@@ -1423,7 +1509,7 @@ async function delOwner(i){
 
 function renderFeeTable(){
   const r=DB.get('roster',[]); const el=document.getElementById('feetbl'); if(!el) return;
-  el.innerHTML=`<table class="rtbl" style="min-width:400px"><thead><tr><th>Owner</th><th>Team</th>${PAY_YEARS.map(y=>`<th style="text-align:center">${y}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead><tbody>
+  el.innerHTML=`<table class="rtbl" style="min-width:400px"><thead><tr><th>Owner Name</th><th>Team</th>${PAY_YEARS.map(y=>`<th style="text-align:center">${y}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead><tbody>
     ${r.map(o=>{const t=PAY_YEARS.filter(y=>o.pay?.[y]==='yes').length*50;return`<tr><td style="font-weight:600">${o.name}</td><td style="color:var(--acc)">${o.team||'—'}</td>${PAY_YEARS.map(y=>`<td style="text-align:center">${ph(o.pay?.[y]||'no')}</td>`).join('')}<td style="text-align:center;font-weight:700;color:var(--em)">$${t}</td></tr>`;}).join('')}
   </tbody></table>`;
 }
@@ -2411,14 +2497,19 @@ function renderPickTracker(tradedPicks, rosters){
 }
 
 // ═══ INIT ════════════════════════════════════════════
-updateUserPill();
-applyTabVisibility();
-renderHome();
-renderSurveyResults();
-renderRoster();
-if(adminUnlocked){ document.getElementById('admin-code-section').style.display='none'; document.getElementById('admin-controls').style.display='block'; renderAdmin(); }
-loadSleeperBase().then(()=>{ updateUserPill(); populateSmackDropdowns(); setSy(WORKER_URL?'ok':''); });
-DB.pull().then(()=>{ setSy(WORKER_URL?'ok':''); });
+function initApp(){
+  document.querySelector('header').style.visibility = '';
+  document.querySelector('main').style.visibility = '';
+  updateUserPill();
+  applyTabVisibility();
+  updateSurveyGate();
+  renderHome();
+  renderSurveyResults();
+  renderRoster();
+  if(adminUnlocked){ document.getElementById('admin-code-section').style.display='none'; document.getElementById('admin-controls').style.display='block'; renderAdmin(); }
+  loadSleeperBase().then(()=>{ updateUserPill(); populateSmackDropdowns(); setSy(WORKER_URL?'ok':''); });
+  DB.pull().then(()=>{ setSy(WORKER_URL?'ok':''); });
+}
 
 
 // Update login modal display
