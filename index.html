@@ -1144,7 +1144,7 @@ document.getElementById('hamburger-btn').addEventListener('click',()=>{
   document.getElementById('hamburger-btn').textContent=navOpen?'✕':'☰';
 });
 
-function switchTab(t){
+async function switchTab(t){
   document.querySelectorAll('.nb,.mnb').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
   const panel=document.getElementById('tp-'+t);
@@ -1152,12 +1152,24 @@ function switchTab(t){
   navOpen=false;
   document.getElementById('mobile-nav').classList.remove('open');
   document.getElementById('hamburger-btn').textContent='☰';
+
+  // Refresh the relevant KV key before rendering — ensures latest data from any device
+  const TAB_KEYS={
+    roster:'roster',board:'messages',survey:'votes',
+    info:'history',office:'rulings',tradeblock:'tradeblock',
+    charter:'charter_meta'
+  };
+  if(TAB_KEYS[t]&&WORKER_URL){
+    try{
+      const r=await fetch(WORKER_URL+'/get?key='+TAB_KEYS[t]);
+      if(r.ok){const d=await r.json();if(d.value!==undefined&&d.value!==null)localStorage.setItem('combine_'+TAB_KEYS[t],JSON.stringify(d.value));}
+    }catch{}
+  }
+
   if(t==='home') renderHome();
   if(t==='standings') loadStandings();
   if(t==='picks') loadPickTracker();
-  if(t==='survey'){
-    renderSurveyResults();
-  }
+  if(t==='survey') renderSurveyResults();
   if(t==='roster') renderRoster();
   if(t==='board') initBoard();
   if(t==='roast') initRoast();
@@ -1285,6 +1297,7 @@ async function toggleTab(t, btn){
   btn.classList.toggle('on', vis[t]!==false);
   await DB.set('tab_visibility',vis);
   applyTabVisibility();
+  renderHome(); // update home page tab cards too
 }
 
 function lockAdmin(){
@@ -2782,18 +2795,33 @@ function renderPickTracker(tradedPicks, rosters){
 }
 
 // ═══ INIT ════════════════════════════════════════════
-function initApp(){
+async function initApp(){
   document.querySelector('header').style.visibility = '';
   document.querySelector('main').style.visibility = '';
-  updateUserPill();
+
+  // Fetch tab_visibility from KV FIRST before showing any nav —
+  // ensures all users see the same tabs the admin has configured
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=tab_visibility');
+      if(r.ok){
+        const d = await r.json();
+        if(d.value !== null && d.value !== undefined){
+          localStorage.setItem('combine_tab_visibility', JSON.stringify(d.value));
+        }
+      }
+    }catch(e){ console.warn('Could not fetch tab_visibility from KV', e); }
+  }
+
   applyTabVisibility();
+  updateUserPill();
   updateSurveyGate();
   renderHome();
   renderSurveyResults();
   renderRoster();
   if(adminUnlocked){ document.getElementById('admin-code-section').style.display='none'; document.getElementById('admin-controls').style.display='block'; renderAdmin(); }
   loadSleeperBase().then(()=>{ updateUserPill(); populateSmackDropdowns(); setSy(WORKER_URL?'ok':''); });
-  DB.pull().then(()=>{ setSy(WORKER_URL?'ok':''); });
+  DB.pull().then(()=>{ applyTabVisibility(); renderHome(); setSy(WORKER_URL?'ok':''); });
 }
 
 
