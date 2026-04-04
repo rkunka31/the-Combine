@@ -429,7 +429,7 @@ main{position:relative;z-index:1}
         <div style="font-size:13px">Voting as <strong style="color:var(--acc)" id="vdisp"></strong></div>
         <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
           <div class="pw"><div class="pf" id="pf" style="width:0%"></div></div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/13</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted)"><span id="ac">0</span>/11</span>
         </div>
         <button class="btn bg2 bsm" onclick="viewResults()">Results</button>
       </div>
@@ -1282,19 +1282,17 @@ function confirmClearAll(){
 
 // ═══ SURVEY ═════════════════════════════════
 const QS=[
-  {id:'q1',t:'Team count',s:'How many teams in the league?',o:['12 teams','14 teams']},
-  {id:'q2',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper?',o:['Sleeper chat only (default)','GroupMe group text','Email chain','Other — Commissioner decides']},
-  {id:'q3',t:'Annual entry fee',s:'Confirm or adjust the annual entry fee.',o:['CAD $55/year as chartered ($50 base + $5 operational)','Vote to adjust amount at Season 1 meeting']},
-  {id:'q4',t:'Prize pool distribution',s:'How should the prize pool be split? (Pool = $50 base x teams)',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner — chartered','Propose alternative at Season 1 meeting']},
-  {id:'q5',t:'Active lineup configuration',s:'How many starters per team?',o:['9 starters — 14-team league (chartered)','10 starters — 12-team league with extra Flex (chartered)','Vote to change lineup slots']},
-  {id:'q6',t:'Taxi squad size',s:'How many taxi spots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
-  {id:'q7',t:'IR spots',s:'How many IR slots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
-  {id:'q8',t:'Scoring format & TEP',s:'Confirm scoring and tight end premium per the charter.',o:['Full PPR + 0.5 TEP per TE reception — chartered','Full PPR + 0.25 TEP per TE reception','Full PPR + 1.0 TEP per TE reception']},
-  {id:'q9',t:'Rookie draft rounds',s:'How many rounds in the annual rookie draft?',o:['3 rounds — chartered default','4 rounds','5 rounds']},
-  {id:'q10',t:'FAAB budget',s:'How much FAAB per team per period?',o:['CAD $100 per period — chartered','Vote to adjust amount']},
-  {id:'q11',t:'Trade deadline policy',s:'Should there be a trade deadline?',o:['Option A — No deadline: trades allowed all year; non-playoff teams cannot trade with playoff teams during playoffs (chartered default)','Option B — Standard deadline: trades cut off 2 weeks before playoffs; off-season trading reopens after championship']},
-  {id:'q12',t:'Trade veto system',s:'Should owners be able to veto trades?',o:['No veto — auto-approve; Commissioner reviews collusion only (chartered)','Commissioner-only veto on extreme cases','48-hour league veto (majority vote kills the trade)']},
-  {id:'q13',t:'Playoff field size',s:'How many teams make the playoffs?',o:['4 teams','6 teams — recommended','8 teams']},
+  {id:'q1',t:'Secondary communication channel',s:'Where should league chatter happen beyond Sleeper?',o:['Sleeper chat only (default)','GroupMe group text','Email chain','Other — Commissioner decides']},
+  {id:'q2',t:'Annual entry fee',s:'Choose the annual base fee per team. All options include the CAD $5 operational fee on top.',o:['CAD $50 base + $5 operational = $55/year total','CAD $75 base + $5 operational = $80/year total','CAD $100 base + $5 operational = $105/year total']},
+  {id:'q3',t:'Prize pool distribution',s:'How should the prize pool be split? (Pool = base fee x 14 teams)',o:['50% champion / 25% runner-up / 15% 3rd place / 10% regular season winner','60% champion / 20% runner-up / 10% 3rd place / 10% regular season winner','Propose alternative at Season 1 meeting']},
+  {id:'q4',t:'Taxi squad size',s:'How many taxi spots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q5',t:'IR spots',s:'How many IR slots per team?',o:['3 spots','5 spots — chartered default','10 spots']},
+  {id:'q6',t:'Scoring format & TEP',s:'Confirm scoring and tight end premium per the charter.',o:['Full PPR + 0.5 TEP per TE reception — chartered','Full PPR + 0.25 TEP per TE reception','Full PPR + 1.0 TEP per TE reception']},
+  {id:'q7',t:'Rookie draft rounds',s:'How many rounds in the annual rookie draft?',o:['3 rounds — chartered default','4 rounds','5 rounds']},
+  {id:'q8',t:'FAAB budget',s:'How much FAAB per team per period?',o:['CAD $100 per period — chartered','CAD $200 per period','Vote to adjust amount']},
+  {id:'q9',t:'Trade deadline policy',s:'Should there be a trade deadline?',o:['Option A — No deadline: trades allowed all year; non-playoff teams cannot trade with playoff teams during playoffs (chartered default)','Option B — Standard deadline: trades cut off 2 weeks before playoffs; off-season trading reopens after championship']},
+  {id:'q10',t:'Trade veto system',s:'Should owners be able to veto trades?',o:['No veto — auto-approve; Commissioner reviews collusion only (chartered)','Commissioner-only veto on extreme cases','48-hour league veto (majority vote kills the trade)']},
+  {id:'q11',t:'Playoff field size',s:'How many teams make the playoffs? (14-team league)',o:['4 teams','6 teams — recommended','8 teams']},
 ];
 let vname=localStorage.getItem('combine_voter')||'', myans={};
 
@@ -1885,9 +1883,32 @@ function uploadCharter(e){
 
 function downloadCharter(){
   const data=localStorage.getItem('combine_charter_data');
-  if(!data){ toast('Charter file not found.'); return; }
-  const meta=DB.get('charter_meta',{name:'charter.docx'});
-  const a=document.createElement('a'); a.href=data; a.download=meta.name; a.click();
+  if(!data){
+    // Try pulling from KV
+    const kvData=DB.get('charter_data',null);
+    if(kvData){ localStorage.setItem('combine_charter_data',kvData); downloadCharter(); return; }
+    toast('Charter not found. Try re-uploading.'); return;
+  }
+  const meta=DB.get('charter_meta',{name:'The_Combine_Charter.docx'});
+  try{
+    // Convert base64 data URL to Blob for reliable download
+    const arr=data.split(',');
+    const mimeMatch=arr[0].match(/:(.*?);/);
+    const mime=mimeMatch?mimeMatch[1]:'application/octet-stream';
+    const bstr=atob(arr[1]);
+    const u8=new Uint8Array(bstr.length);
+    for(let i=0;i<bstr.length;i++) u8[i]=bstr.charCodeAt(i);
+    const blob=new Blob([u8],{type:mime});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=meta.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); document.body.removeChild(a); },100);
+  }catch(e){
+    // Fallback for small files
+    const a=document.createElement('a'); a.href=data; a.download=meta.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
 }
 
 async function removeCharter(){
