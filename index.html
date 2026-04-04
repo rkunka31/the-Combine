@@ -1890,7 +1890,7 @@ function downloadCharter(){
   const a=document.createElement('a'); a.href=data; a.download=meta.name; a.click();
 }
 
-function removeCharter(){
+async function removeCharter(){
   if(!confirm('Remove the charter?')) return;
   localStorage.removeItem('combine_charter_data');
   await DB.set('charter_data',null);
@@ -1992,15 +1992,15 @@ function populateSmackDropdowns(){
 // ═══ HOME PAGE ══════════════════════════════
 const TAB_DESCRIPTIONS = {
   survey:     {icon:'📋', label:'Survey',        desc:'Cast your vote on all open league questions. Results update live as members respond.'},
-  roster:     {icon:'👥', label:'Roster',         desc:'Full owner directory with contact info and payment status for all three years.'},
-  info:       {icon:'📜', label:'League Info',    desc:'Charter summary, payout table, season history, and the FAAB penalty log.'},
-  board:      {icon:'💬', label:'Board',          desc:'League message board with channels for general chat, trades, and waiver talk.'},
-  standings:  {icon:'📊', label:'Standings',      desc:'Live W/L standings, points for/against, power rankings, and AI commentary pulled from Sleeper.'},
-  picks:      {icon:'📋', label:'Draft Picks',     desc:'Full rookie draft pick ownership grid — see who owns what pick in every year, including all traded picks.'},
-  roast:      {icon:'🔥', label:'Weekly Roast',   desc:'AI-powered matchup commentary — pull any week from Sleeper and generate recaps or roasts.'}
-  office:     {icon:'⚖️', label:'Commissioner',   desc:'Official rulings, decisions, and appeals — the public record of commissioner actions.'},
-  tradeblock: {icon:'🔄', label:'Trade Block',    desc:'Post players and picks you're willing to move. Log in as your team to manage your listing.'}
-  charter:    {icon:'📄', label:'Charter',        desc:'Upload and download the official league charter. Always available for reference.'},
+  roster:     {icon:'👥', label:'Roster',        desc:'Full owner directory with contact info and payment status for all three years.'},
+  info:       {icon:'📜', label:'League Info',   desc:'Charter summary, payout table, season history, and the FAAB penalty log.'},
+  board:      {icon:'💬', label:'Board',         desc:'League message board with channels for general chat, trades, and waiver talk.'},
+  standings:  {icon:'📊', label:'Standings',     desc:'Live W/L standings, points for/against, power rankings, and AI commentary pulled from Sleeper.'},
+  picks:      {icon:'📋', label:'Draft Picks',   desc:'Full rookie draft pick ownership grid — see who owns what pick in every year.'},
+  roast:      {icon:'🔥', label:'Weekly Roast',  desc:'AI-powered matchup commentary — pull any week from Sleeper and generate recaps or roasts.'},
+  office:     {icon:'⚖️', label:'Commissioner',  desc:'Official rulings, decisions, and appeals — the public record of commissioner actions.'},
+  tradeblock: {icon:'🔄', label:'Trade Block',   desc:'Post players and picks you are open to moving. Log in as your team to manage your listing.'},
+  charter:    {icon:'📄', label:'Charter',       desc:'Upload and download the official league charter. Always available for reference.'},
 };
 
 const HOME_FACTS = [
