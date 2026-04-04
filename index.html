@@ -1463,8 +1463,8 @@ function renderRoster(){
   document.getElementById('rb').innerHTML=r.length===0
     ?`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Loading from Sleeper... If this persists, owners will be added automatically when you connect.</td></tr>`
     :r.map((o,i)=>`<tr>
-        <td style="font-weight:600">${o.name||'<span style="color:var(--muted);font-style:italic;font-weight:400">Not set</span>'}</td>
-        <td style="color:var(--acc)">${o.team||o.sleeper_name||'—'}</td>
+        <td style="font-weight:600">${o.team||o.sleeper_name||'—'}</td>
+        <td style="color:var(--muted);font-size:12px">${o.name&&o.name!==o.sleeper_name&&o.name!==o.team?o.name:'<span style="font-style:italic">Enter real name</span>'}</td>
         <td style="color:var(--muted);font-size:12px">${o.email||'—'}</td>
         <td style="color:var(--muted);font-size:12px">${o.phone||'—'}</td>
         ${PAY_YEARS.map(y=>`<td style="text-align:center">${ph(o.pay?.[y]||'no')}</td>`).join('')}
@@ -1485,7 +1485,9 @@ function renderRoster(){
 function editOwner(i){
   const o=DB.get('roster',[])[i];
   document.getElementById('omt').textContent='Edit Owner';
-  document.getElementById('fn').value=o.name||'';
+  // Strip auto-migrated sleeper handle — real name must be different from handle
+  const realName=(o.name&&o.name!==o.sleeper_name&&o.name!==o.team)?o.name:'';
+  document.getElementById('fn').value=realName;
   document.getElementById('ft').value=o.team||'';
   document.getElementById('fe').value=o.email||'';
   document.getElementById('fp').value=o.phone||'';
@@ -1495,7 +1497,7 @@ function editOwner(i){
 }
 
 async function saveOwner(){
-  const n=document.getElementById('fn').value.trim(); if(!n){toast('Name required.');return;}
+  const n=document.getElementById('fn').value.trim();
   const pay={}; PAY_YEARS.forEach(y=>{ const el=document.getElementById('f'+y); if(el) pay[y]=el.value; });
   const o={name:n,team:document.getElementById('ft').value.trim(),email:document.getElementById('fe').value.trim(),phone:document.getElementById('fp').value.trim(),pay};
   const r=DB.get('roster',[]); const ei=document.getElementById('feid').value;
@@ -2166,15 +2168,16 @@ function renderSurveyResults(){
 
   const all = DB.get('votes', {});
   const voters = Object.keys(all).filter(k => k !== '_meta');
+  const me = currentUser ? currentUser.team_name : (vname || localStorage.getItem('combine_voter') || '');
 
   if(!voters.length){
-    el.innerHTML = `<div style="text-align:center;padding:28px;color:var(--muted);font-style:italic;font-size:13px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r)">No votes submitted yet. Share the link with league members to get started.</div>`;
+    el.innerHTML = `<div style="text-align:center;padding:28px;color:var(--muted);font-style:italic;font-size:13px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r)">No votes submitted yet. Share the site with league members to get started.</div>`;
     return;
   }
 
   const threshold = Math.ceil(voters.length * 2 / 3);
 
-  // Tally votes per question
+  // Build tally
   const tally = {};
   voters.forEach(v => {
     QS.forEach(q => {
@@ -2189,85 +2192,211 @@ function renderSurveyResults(){
     });
   });
 
-  // Header summary
-  let html = `
-    <div class="card" style="padding:16px 18px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+  // Build leading answer per question for summary
+  const leaders = {};
+  QS.forEach(q => {
+    const t = tally[q.id] || {};
+    const entries = Object.entries(t).sort((a,b) => b[1]-a[1]);
+    if(entries.length) leaders[q.id] = { idx: parseInt(entries[0][0]), count: entries[0][1] };
+  });
+
+  // ── SUMMARY STRIP ───────────────────────────────────────
+  const summaryHTML = `
+    <div class="card" style="padding:16px 18px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div>
-          <div style="font-family:var(--serif);font-size:18px;color:var(--bone)">${voters.length} owner${voters.length!==1?'s':''} voted</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">2/3 majority threshold = ${threshold} votes · ${QS.length} questions total</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--bone)">${voters.length} of 14 owners voted</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">2/3 threshold = ${threshold} votes to pass · ${QS.length} questions</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="bdg bg">✓ Passes</span>
-          <span class="bdg ba">⚠ Review</span>
-          <span class="bdg bm">○ No votes</span>
-        </div>
+        <button class="btn bg2 bsm" onclick="toggleSurveyDetails()">
+          <span id="survey-toggle-label">Show Details ▼</span>
+        </button>
       </div>
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">Who has voted</div>
+
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Leading answers</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+        ${QS.map((q, qi) => {
+          const l = leaders[q.id];
+          if(!l) return `<div style="display:flex;gap:8px;align-items:center;font-size:12px"><span style="font-family:var(--mono);color:var(--acc);min-width:24px">Q${qi+1}</span><span style="color:var(--muted);font-style:italic">No votes yet</span></div>`;
+          const passes = !q.multi && l.count >= threshold;
+          const pct = voters.length > 0 ? Math.round(l.count/voters.length*100) : 0;
+          const shortAns = q.o[l.idx].length > 55 ? q.o[l.idx].slice(0,52)+'…' : q.o[l.idx];
+          return `<div style="display:flex;gap:8px;align-items:center;font-size:12px;flex-wrap:wrap">
+            <span style="font-family:var(--mono);color:var(--acc);min-width:24px">Q${qi+1}</span>
+            <span style="font-weight:600;color:var(--bone);flex:1;min-width:120px">${shortAns}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap">${l.count}v · ${pct}%</span>
+            ${q.multi?'<span class="bdg bm" style="font-size:9px">multi</span>':passes?'<span class="bdg bg" style="font-size:9px">✓</span>':'<span class="bdg ba" style="font-size:9px">~</span>'}
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Who has voted</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${voters.map(v => {
-          const answered = QS.filter(q => all[v][q.id] !== undefined).length;
-          return `<div style="background:rgba(200,169,110,.08);border:1px solid var(--bdra);border-radius:20px;padding:4px 11px;font-size:12px;color:var(--acc2)">${v} <span style="color:var(--muted)">(${answered}/${QS.length})</span></div>`;
+          const answered = QS.filter(q => {
+            const a = all[v][q.id];
+            return q.multi ? Array.isArray(a)&&a.length>0 : a!==undefined;
+          }).length;
+          const isMe = v === me;
+          return `<div class="voter-tile" data-voter="${v}" style="
+            background:${isMe?'rgba(200,169,110,.15)':'rgba(255,255,255,.04)'};
+            border:1px solid ${isMe?'var(--acc)':'var(--bdr)'};
+            border-radius:20px;padding:5px 12px;font-size:12px;
+            color:${isMe?'var(--acc2)':'var(--muted)'};
+            cursor:pointer;transition:all .15s;touch-action:manipulation"
+            onclick="expandVoterTile('${v}')"
+            title="Click to see ${v}'s answers">
+            ${isMe?'⭐ ':''}${v} <span style="opacity:.7">(${answered}/${QS.length})</span>
+          </div>`;
         }).join('')}
       </div>
     </div>`;
 
-  // Per-question breakdown
-  html += `<div style="display:flex;flex-direction:column;gap:10px">`;
-  QS.forEach((q, qi) => {
-    const t = tally[q.id] || {};
-    const entries = Object.entries(t).sort((a,b) => b[1]-a[1]);
-    const totalAns = Object.values(t).reduce((a,b)=>a+b,0);
-    const leading = entries[0];
-    const passes = leading && leading[1] >= threshold;
-    const noVotes = totalAns === 0;
-
-    const statusBadge = noVotes
-      ? '<span class="bdg bm">○ No votes yet</span>'
-      : q.multi
-        ? '<span class="bdg bm" style="font-size:9px">Select all that apply</span>'
-        : passes
-          ? '<span class="bdg bg">✓ Passes</span>'
-          : '<span class="bdg ba">⚠ Needs more votes</span>';
-
-    html += `
-      <div class="card" style="padding:15px 17px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-          <div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-              <span style="font-family:var(--mono);font-size:11px;color:var(--acc)">Q${qi+1}</span>
-              <span style="font-size:14px;font-weight:600;color:var(--bone)">${q.t}</span>
+  // ── VOTER TILES ─────────────────────────────────────────
+  const tilesHTML = `
+    <div id="voter-tiles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px">
+      ${voters.map(v => {
+        const vdata = all[v] || {};
+        const answered = QS.filter(q => {
+          const a = vdata[q.id];
+          return q.multi ? Array.isArray(a)&&a.length>0 : a!==undefined;
+        }).length;
+        const isMe = v === me;
+        const ts = vdata.ts ? new Date(vdata.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+        return `<div class="voter-card" id="vtile-${v.replace(/\s/g,'_')}" style="
+          background:var(--card);border:1px solid ${isMe?'var(--acc)':'var(--bdr)'};
+          border-radius:var(--r);overflow:hidden;transition:border-color .2s">
+          <!-- Tile header — always visible -->
+          <div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;background:${isMe?'rgba(200,169,110,.06)':'transparent'}"
+               onclick="toggleVoterCard('${v.replace(/\s/g,'_')}')">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--g4),var(--acc));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:15px;color:var(--g1);font-weight:700;flex-shrink:0">${v[0].toUpperCase()}</div>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:${isMe?'var(--acc2)':'var(--bone)'}">${isMe?'⭐ ':''}${v}</div>
+                <div style="font-size:11px;color:var(--muted)">${answered}/${QS.length} answered${ts?' · '+ts:''}</div>
+              </div>
             </div>
-            <div style="font-size:12px;color:var(--muted)">${q.s}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              ${isMe?`<button class="btn bd bsm" onclick="event.stopPropagation();deleteMySurvey('${v}')" style="font-size:11px;padding:3px 8px">Remove</button>`:''}
+              <span id="vtile-arrow-${v.replace(/\s/g,'_')}" style="color:var(--muted);font-size:12px;transition:transform .2s">▼</span>
+            </div>
           </div>
-          ${statusBadge}
-        </div>
-        ${q.o.map((opt, oi) => {
-          const count = t[oi] || 0;
-          const pct = totalAns > 0 ? Math.round(count/totalAns*100) : 0;
-          const isLeading = entries[0] && parseInt(entries[0][0]) === oi && count > 0;
-          // who voted for this option
-          const whoVoted = q.multi
-            ? voters.filter(v => Array.isArray(all[v][q.id]) && all[v][q.id].includes(oi))
-            : voters.filter(v => all[v][q.id] === oi);
-          return `
-            <div style="margin-bottom:7px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-                <div style="font-size:13px;color:${isLeading?'var(--bone)':'var(--muted)'};font-weight:${isLeading?'600':'400'}">${opt}</div>
-                <div style="font-family:var(--mono);font-size:11px;color:${isLeading?'var(--acc)':'var(--muted)'};white-space:nowrap;margin-left:8px">${count} vote${count!==1?'s':''} · ${pct}%</div>
-              </div>
-              <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:3px">
-                <div style="height:100%;width:${pct}%;background:${isLeading?'var(--acc)':'rgba(143,168,154,.3)'};border-radius:3px;transition:width .4s"></div>
-              </div>
-              ${whoVoted.length ? `<div style="font-size:11px;color:var(--muted)">${whoVoted.join(' · ')}</div>` : ''}
-            </div>`;
-        }).join('')}
-      </div>`;
-  });
-  html += `</div>`;
+          <!-- Answers — collapsed by default -->
+          <div id="vtile-body-${v.replace(/\s/g,'_')}" style="display:none;padding:10px 14px;border-top:1px solid var(--bdr)">
+            ${QS.map((q, qi) => {
+              const ans = vdata[q.id];
+              const hasAns = q.multi ? Array.isArray(ans)&&ans.length>0 : ans!==undefined;
+              if(!hasAns) return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--muted);font-style:italic">Q${qi+1}: not answered</div>`;
+              const ansText = q.multi
+                ? ans.map(i => q.o[i]).join(' + ')
+                : q.o[ans];
+              const shortQ = q.t.length > 30 ? q.t.slice(0,28)+'…' : q.t;
+              return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+                <div style="font-size:10px;font-family:var(--mono);color:var(--acc);margin-bottom:2px">Q${qi+1} · ${shortQ}</div>
+                <div style="font-size:12px;color:var(--bone)">${ansText}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
 
-  el.innerHTML = html;
+  // ── QUESTION DETAIL SECTION (collapsible) ───────────────
+  const detailHTML = `
+    <div id="survey-details" style="display:none">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">Question Breakdown</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${QS.map((q, qi) => {
+          const t = tally[q.id] || {};
+          const entries = Object.entries(t).sort((a,b) => b[1]-a[1]);
+          const totalAns = Object.values(t).reduce((a,b)=>a+b,0);
+          const leading = entries[0];
+          const passes = !q.multi && leading && leading[1] >= threshold;
+          const noVotes = totalAns === 0;
+          const badge = noVotes ? '<span class="bdg bm">○ No votes</span>'
+            : q.multi ? '<span class="bdg bm" style="font-size:9px">Select all that apply</span>'
+            : passes ? '<span class="bdg bg">✓ Passes</span>'
+            : '<span class="bdg ba">⚠ Needs more votes</span>';
+          return `<div class="card" style="padding:14px 16px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+                  <span style="font-family:var(--mono);font-size:11px;color:var(--acc)">Q${qi+1}</span>
+                  <span style="font-size:14px;font-weight:600;color:var(--bone)">${q.t}</span>
+                </div>
+                <div style="font-size:11px;color:var(--muted)">${q.s}</div>
+              </div>
+              ${badge}
+            </div>
+            ${q.o.map((opt, oi) => {
+              const count = t[oi] || 0;
+              const pct = totalAns > 0 ? Math.round(count/voters.length*100) : 0;
+              const isLead = entries[0] && parseInt(entries[0][0]) === oi && count > 0;
+              const whoVoted = q.multi
+                ? voters.filter(v => Array.isArray(all[v][q.id]) && all[v][q.id].includes(oi))
+                : voters.filter(v => all[v][q.id] === oi);
+              return `<div style="margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                  <div style="font-size:12px;color:${isLead?'var(--bone)':'var(--muted)'};font-weight:${isLead?600:400}">${opt}</div>
+                  <div style="font-family:var(--mono);font-size:11px;color:${isLead?'var(--acc)':'var(--muted)'};white-space:nowrap;margin-left:8px">${count}v · ${pct}%</div>
+                </div>
+                <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:3px">
+                  <div style="height:100%;width:${pct}%;background:${isLead?'var(--acc)':'rgba(143,168,154,.3)'};border-radius:3px;transition:width .5s"></div>
+                </div>
+                ${whoVoted.length ? `<div style="font-size:10px;color:var(--muted)">${whoVoted.join(' · ')}</div>` : ''}
+              </div>`;
+            }).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  el.innerHTML = summaryHTML + tilesHTML + detailHTML;
 }
+
+function toggleVoterCard(key){
+  const body = document.getElementById(`vtile-body-${key}`);
+  const arrow = document.getElementById(`vtile-arrow-${key}`);
+  if(!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if(arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function expandVoterTile(voter){
+  const key = voter.replace(/\s/g,'_');
+  const body = document.getElementById(`vtile-body-${key}`);
+  if(body && body.style.display !== 'block') toggleVoterCard(key);
+  // Scroll to it
+  const card = document.getElementById(`vtile-${key}`);
+  if(card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function toggleSurveyDetails(){
+  const det = document.getElementById('survey-details');
+  const lbl = document.getElementById('survey-toggle-label');
+  if(!det) return;
+  const open = det.style.display === 'block';
+  det.style.display = open ? 'none' : 'block';
+  if(lbl) lbl.textContent = open ? 'Show Details ▼' : 'Hide Details ▲';
+}
+
+async function deleteMySurvey(voter){
+  if(!confirm(`Remove your survey responses? You can re-vote at any time.`)) return;
+  const all = DB.get('votes',{});
+  delete all[voter];
+  await DB.set('votes', all);
+  // Also clear local vname so they can re-vote
+  vname = '';
+  localStorage.removeItem('combine_voter');
+  document.getElementById('sg').style.display='block';
+  document.getElementById('sbody').style.display='none';
+  myans = {};
+  renderSurveyResults();
+  updateSurveyGate();
+  toast('Your votes have been removed. You can re-vote now.');
+}
+
 
 // ═══ STANDINGS ═══════════════════════════════
 let standingsCache = null;
