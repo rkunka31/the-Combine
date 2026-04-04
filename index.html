@@ -333,15 +333,16 @@ main{position:relative;z-index:1}
 <header>
   <div class="logo"><span class="logo-sm">The</span><span class="logo-main">Combine</span></div>
   <nav id="desktop-nav">
-    <button class="nb on" data-t="survey">📋 Survey</button>
+    <button class="nb on" data-t="home">🏠 Home</button>
+    <button class="nb" data-t="survey">📋 Survey</button>
     <button class="nb" data-t="roster">👥 Roster</button>
     <button class="nb" data-t="info">📜 Info</button>
     <button class="nb" data-t="board">💬 Board</button>
+    <button class="nb" data-t="standings">📊 Standings</button>
+    <button class="nb" data-t="picks">📋 Picks</button>
     <button class="nb" data-t="roast">🔥 Roast</button>
-    <button class="nb" data-t="trophy">🏆 Trophies</button>
     <button class="nb" data-t="office">⚖️ Commissioner</button>
     <button class="nb" data-t="tradeblock">🔄 Trade Block</button>
-    <button class="nb" data-t="smack">🗣️ Smack</button>
     <button class="nb" data-t="charter">📄 Charter</button>
     <button class="nb" data-t="admin">🔧 Admin</button>
   </nav>
@@ -354,15 +355,16 @@ main{position:relative;z-index:1}
 </header>
 
 <div class="mobile-nav" id="mobile-nav">
-  <button class="mnb on" data-t="survey">📋 Survey</button>
+  <button class="mnb on" data-t="home">🏠 Home</button>
+  <button class="mnb" data-t="survey">📋 Survey</button>
   <button class="mnb" data-t="roster">👥 Roster</button>
   <button class="mnb" data-t="info">📜 League Info</button>
   <button class="mnb" data-t="board">💬 Board</button>
+  <button class="mnb" data-t="standings">📊 Standings</button>
+  <button class="mnb" data-t="picks">📋 Draft Picks</button>
   <button class="mnb" data-t="roast">🔥 Weekly Roast</button>
-  <button class="mnb" data-t="trophy">🏆 Trophy Case</button>
   <button class="mnb" data-t="office">⚖️ Commissioner</button>
   <button class="mnb" data-t="tradeblock">🔄 Trade Block</button>
-  <button class="mnb" data-t="smack">🗣️ Smack Talk</button>
   <button class="mnb" data-t="charter">📄 Charter</button>
   <button class="mnb" data-t="admin">🔧 Admin</button>
 </div>
@@ -370,7 +372,51 @@ main{position:relative;z-index:1}
 <main>
 
 <!-- SURVEY -->
-<div class="tp on" id="tp-survey">
+<div class="tp on" id="tp-home">
+  <div class="hero" data-bg="HOME">
+    <h1>The Combine</h1>
+    <p>dynasty football league hub · the-combine.ca</p>
+  </div>
+  <div class="wrap">
+
+    <!-- Welcome card -->
+    <div class="card" style="margin-bottom:18px;padding:24px">
+      <div style="display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <div style="font-family:var(--serif);font-size:22px;color:var(--bone);margin-bottom:8px">Welcome to The Combine</div>
+          <p style="color:var(--muted);font-size:14px;line-height:1.8">The Combine is your dynasty fantasy football league hub. Everything you need — charter, votes, roster, weekly roasts, trade block, and league chat — lives here. This site syncs across all devices in real time so every owner sees the same data.</p>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <div style="background:rgba(200,169,110,.1);border:1px solid var(--bdra);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--acc)">🏈 Dynasty Format</div>
+            <div style="background:rgba(200,169,110,.1);border:1px solid var(--bdra);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--acc)">⚡ Sleeper Connected</div>
+            <div style="background:rgba(200,169,110,.1);border:1px solid var(--bdra);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--acc)">🔄 Live Sync</div>
+            <div style="background:rgba(200,169,110,.1);border:1px solid var(--bdra);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--acc)">🇨🇦 CAD $55/year</div>
+          </div>
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-family:var(--serif);font-size:64px;color:var(--acc);line-height:1">⚙️</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px">The Combine</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab guide — only shows visible tabs -->
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">How to navigate</div>
+    <div id="home-tab-guide" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px"></div>
+
+    <!-- Quick facts -->
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:12px">League at a glance</div>
+    <div class="card" style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:400px">
+        <tbody id="home-facts"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:18px;font-size:12px;color:var(--muted);text-align:center">
+      Commissioner: Rob Kunka · rkunka31@gmail.com · Payment by E-Transfer
+    </div>
+  </div>
+</div>
+
+<div class="tp" id="tp-survey">
   <div class="hero" data-bg="VOTE"><h1>Charter Survey</h1><p>vote · 2/3 majority passes · commissioner reviews the rest</p></div>
   <div class="wrap">
     <div class="sg" id="sg">
@@ -391,6 +437,15 @@ main{position:relative;z-index:1}
       <div style="display:flex;justify-content:flex-end;margin-top:16px">
         <button class="btn ba2" id="ssb" onclick="submitSurvey()" disabled>Submit Votes →</button>
       </div>
+    </div>
+
+    <!-- SURVEY RESULTS DASHBOARD -->
+    <div style="margin-top:28px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <span>Survey Results</span>
+        <button class="btn bg2 bsm" onclick="renderSurveyResults()">🔄 Refresh</button>
+      </div>
+      <div id="survey-results-dash"></div>
     </div>
   </div>
 </div>
@@ -549,28 +604,73 @@ main{position:relative;z-index:1}
 </div>
 
 <!-- TROPHIES -->
-<div class="tp" id="tp-trophy">
-  <div class="hero" data-bg="TROPHY"><h1>Trophy Case</h1><p>season awards · voted by the league</p></div>
+
+
+<!-- STANDINGS -->
+<div class="tp" id="tp-standings">
+  <div class="hero" data-bg="STAND"><h1>Standings</h1><p>live from sleeper · ai commentary · updated weekly</p></div>
   <div class="wrap">
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
-      <button class="btn ba2" onclick="openM('trm')">+ Add Award</button>
-      <select id="trf" style="margin-left:auto;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--bone);font-size:12px;outline:none" onchange="renderTrophies()">
-        <option value="all">All Seasons</option><option value="2026">2026</option>
-      </select>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap">
+      <div id="standings-week-info" style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px"></div>
+      <button class="btn ba2 bsm" style="margin-left:auto" onclick="loadStandings(true)">🔄 Refresh</button>
+      <button class="btn bg2 bsm" onclick="genStandingsComment()">🤖 AI Take</button>
     </div>
-    <div class="tg" id="tg"></div>
+
+    <!-- AI commentary box -->
+    <div id="standings-ai" style="display:none;background:linear-gradient(135deg,rgba(200,169,110,.07),rgba(34,64,51,.8));border:1px solid var(--bdra);border-radius:var(--r);padding:16px 18px;margin-bottom:18px;font-size:14px;line-height:1.7;color:var(--bone);font-style:italic"></div>
+
+    <!-- Main standings table -->
+    <div class="card tbl-wrap" style="margin-bottom:18px">
+      <table class="rtbl" id="standings-tbl" style="min-width:560px">
+        <thead><tr>
+          <th style="width:32px">#</th>
+          <th>Team</th>
+          <th style="text-align:center">W</th>
+          <th style="text-align:center">L</th>
+          <th style="text-align:center">T</th>
+          <th style="text-align:right">PF</th>
+          <th style="text-align:right">PA</th>
+          <th style="text-align:right">MaxPF</th>
+          <th style="text-align:center">Streak</th>
+          <th style="text-align:center">Status</th>
+        </tr></thead>
+        <tbody id="standings-body">
+          <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--muted);font-style:italic">Loading from Sleeper…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Power rankings -->
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:10px">Power Rankings — by MaxPF</div>
+    <div class="card tbl-wrap" style="margin-bottom:18px">
+      <table class="rtbl" id="power-tbl" style="min-width:400px">
+        <thead><tr>
+          <th style="width:32px">Rank</th>
+          <th>Team</th>
+          <th style="text-align:right">MaxPF</th>
+          <th style="text-align:right">Avg/Wk</th>
+          <th style="text-align:center">Rookie Draft Pos.</th>
+        </tr></thead>
+        <tbody id="power-body">
+          <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);font-style:italic">Load standings to see power rankings.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-<div class="ov" id="trm">
-  <div class="modal"><h2>Add Award</h2>
-    <div class="g2" style="gap:10px;margin-bottom:12px">
-      <div class="fld"><label>Season</label><input id="trs" placeholder="2026"></div>
-      <div class="fld"><label>Award Name</label><input id="tra" placeholder="Best Trade"></div>
-      <div class="fld"><label>Winner / Team</label><input id="trw2" placeholder="Team or owner name"></div>
-      <div class="fld"><label>Icon (emoji)</label><input id="tri" placeholder="🏆" maxlength="4"></div>
-      <div class="fld" style="grid-column:1/-1"><label>Note</label><textarea id="trn" rows="2" style="resize:vertical" placeholder="What happened?"></textarea></div>
+
+
+<!-- DRAFT PICKS -->
+<div class="tp" id="tp-picks">
+  <div class="hero" data-bg="PICKS"><h1>Draft Pick Tracker</h1><p>traded picks · ownership by year · live from sleeper</p></div>
+  <div class="wrap">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+      <div style="font-size:13px;color:var(--muted)">Shows all rookie draft picks and their current owners. Highlights traded picks.</div>
+      <button class="btn ba2 bsm" style="margin-left:auto" onclick="loadPickTracker(true)">🔄 Refresh</button>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeM('trm')">Cancel</button><button class="btn ba2" onclick="saveTrophy()">Add</button></div>
+    <div id="pick-tracker-content">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-style:italic">Loading pick data from Sleeper…</div>
+    </div>
   </div>
 </div>
 
@@ -607,22 +707,19 @@ main{position:relative;z-index:1}
 
 <!-- TRADE BLOCK -->
 <div class="tp" id="tp-tradeblock">
-  <div class="hero" data-bg="TRADE"><h1>Trade Block</h1><p>log in as your team · post players & picks · say what you want</p></div>
+  <div class="hero" data-bg="TRADE"><h1>Trade Block</h1><p>available players & picks · what teams are looking for</p></div>
   <div class="wrap">
-    <div class="login-banner" id="tb-login-banner">
-      <div style="font-size:22px">🔄</div>
-      <p id="tb-login-msg">Log in as your team to post your trade block. Others can see what you're offering and what you need.</p>
-      <button class="btn ba2 bsm" onclick="openTradeBlockForm()">Post My Block</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--muted)">Teams listed here are open to dealing. Log in as your team to manage your listing.</div>
+      <button class="btn ba2" onclick="openTradeBlockForm()">+ Add My Availability</button>
     </div>
-    <div style="margin-bottom:16px">
-      <div id="tb-listings"></div>
-    </div>
+    <div id="tb-listings"></div>
   </div>
 </div>
 <div class="ov" id="tb-modal">
   <div class="modal" style="max-width:580px">
-    <h2>Post Trade Block</h2>
-    <div class="msub" id="tb-modal-sub">Select players and picks you're willing to move, and what you're looking for.</div>
+    <h2>My Trade Availability</h2>
+    <div class="msub" id="tb-modal-sub">Select players and picks you're open to moving. Add what you're looking for so other teams know what interests you.</div>
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:14px">
       <div class="fld">
         <label>Players Available (hold Ctrl/Cmd to select multiple)</label>
@@ -641,7 +738,7 @@ main{position:relative;z-index:1}
         <textarea id="tb-note" rows="2" style="resize:vertical" placeholder="e.g. Rebuilding — interested in picks and young players. DM me."></textarea>
       </div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeM('tb-modal')">Cancel</button><button class="btn ba2" onclick="postTradeBlock()">Post Block</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeM('tb-modal')">Cancel</button><button class="btn ba2" onclick="postTradeBlock()">Save Listing</button></div>
   </div>
 </div>
 
@@ -957,9 +1054,9 @@ function updateUserPill(){
 try{ currentUser=JSON.parse(localStorage.getItem('combine_current_user')); }catch{ currentUser=null; }
 
 // ═══ NAVIGATION ═════════════════════════════
-const TAB_LABELS={survey:'Survey',roster:'Roster',info:'League Info',board:'Board',roast:'Roast',trophy:'Trophies',office:'Commissioner',tradeblock:'Trade Block',smack:'Smack Talk',charter:'Charter',admin:'Admin'};
+const TAB_LABELS={home:'Home',survey:'Survey',roster:'Roster',info:'League Info',board:'Board',standings:'Standings',picks:'Draft Picks',roast:'Roast',office:'Commissioner',tradeblock:'Trade Block',charter:'Charter',admin:'Admin'};
 
-function getTabVis(){ return DB.get('tab_visibility',{survey:true,roster:true,info:true,board:true,roast:true,trophy:true,office:true,tradeblock:true,smack:true,charter:true}); }
+function getTabVis(){ return DB.get('tab_visibility',{home:true,survey:true,roster:true,info:true,board:true,standings:true,picks:true,roast:true,office:true,tradeblock:true,charter:true}); }
 
 function applyTabVisibility(){
   const vis=getTabVis();
@@ -985,13 +1082,15 @@ function switchTab(t){
   navOpen=false;
   document.getElementById('mobile-nav').classList.remove('open');
   document.getElementById('hamburger-btn').textContent='☰';
+  if(t==='home') renderHome();
+  if(t==='standings') loadStandings();
+  if(t==='picks') loadPickTracker();
+  if(t==='survey') renderSurveyResults();
   if(t==='roster') renderRoster();
   if(t==='board') initBoard();
   if(t==='roast') initRoast();
-  if(t==='trophy') renderTrophies();
   if(t==='office') renderRulings();
   if(t==='tradeblock') renderTradeBlock();
-  if(t==='smack') renderSmackHist();
   if(t==='info') renderFeeTable();
   if(t==='charter') renderCharter();
   if(t==='admin') renderAdmin();
@@ -1035,7 +1134,7 @@ function renderAdmin(){
   document.getElementById('admin-controls').style.display='block';
   const vis=getTabVis();
   const grid=document.getElementById('tab-toggle-grid');
-  const tabs=['survey','roster','info','board','roast','trophy','office','tradeblock','smack','charter'];
+  const tabs=['home','survey','roster','info','board','standings','picks','roast','office','tradeblock','charter'];
   grid.innerHTML=tabs.map(t=>`
     <div class="tab-toggle">
       <span>${TAB_LABELS[t]||t}</span>
@@ -1045,8 +1144,8 @@ function renderAdmin(){
   renderDataSnapshot();
 }
 
-const DATA_KEYS=['roster','messages','votes','trophies','tradeblock','rulings','history','penalties','smacklog','charter_meta','tab_visibility'];
-const KEY_LABELS={roster:'Owners & Payments',messages:'Board Messages',votes:'Survey Votes',trophies:'Trophy Case',tradeblock:'Trade Block',rulings:'Rulings',history:'Season History',penalties:'Penalty Log',smacklog:'Smack History',charter_meta:'Charter File',tab_visibility:'Tab Settings'};
+const DATA_KEYS=['roster','messages','votes','tradeblock','rulings','history','penalties','smacklog','charter_meta','charter_data','tab_visibility'];
+const KEY_LABELS={roster:'Owners & Payments',messages:'Board Messages',votes:'Survey Votes',tradeblock:'Trade Block',rulings:'Rulings',history:'Season History',penalties:'Penalty Log',smacklog:'Smack History',charter_meta:'Charter File',charter_data:'Charter File Data',tab_visibility:'Tab Settings'};
 
 function renderDataSnapshot(){
   const snap=document.getElementById('data-snapshot'); if(!snap) return;
@@ -1238,7 +1337,7 @@ function updProg(){
 
 async function submitSurvey(){
   const all=DB.get('votes',{}); all[vname]={...myans,ts:Date.now()};
-  await DB.set('votes',all); toast('Votes submitted!'); viewResults();
+  await DB.set('votes',all); toast('Votes submitted!'); renderSurveyResults(); viewResults();
 }
 
 function viewResults(){
@@ -1361,21 +1460,18 @@ async function delPen(i){ if(!confirm('Remove?'))return; const d=DB.get('penalti
 // ═══ BOARD ═══════════════════════════════════
 const CHANS=[
   {id:'general',icon:'#',desc:'League-wide chatter · all welcome'},
-  {id:'trade-block',icon:'🔄',desc:'Trade talk and player movement'},
-  {id:'draft-room',icon:'📋',desc:'Rookie rankings, big boards, strategy'},
-  {id:'playoffs',icon:'🏆',desc:'Bracket talk and championship runs'},
-  {id:'trash-talk',icon:'🔥',desc:'No mercy. All talk. Keep it fun.'},
-  {id:'injury-report',icon:'🚑',desc:'Breaking injuries and waiver reactions'},
-  {id:'waiver-wire',icon:'📈',desc:'FAAB strategy and free agent talk'},
+  {id:'trades',icon:'🔄',desc:'Trade talk, offers, and player movement'},
+  {id:'waiver-wire',icon:'📈',desc:'FAAB strategy and free agent pickups'},
   {id:'commissioner',icon:'⚖️',desc:'Official announcements and rulings'},
 ];
 const SEED={
   general:[
     {author:'The Combine',av:'TC',text:'Welcome to The Combine — your dynasty league hub. Charter is live. Survey is open.',time:'Apr 3 2026',rx:{'🏈':4,'🔥':2}},
-    {author:'The Combine',av:'TC',text:'2-year upfront payment ($100) required to lock your spot. Check the Roster tab.',time:'Apr 3 2026',rx:{'💰':3}},
+    {author:'The Combine',av:'TC',text:'Two-year upfront payment (CAD $110) required to lock your spot. E-Transfer to rkunka31@gmail.com.',time:'Apr 3 2026',rx:{'💰':3}},
   ],
-  'trash-talk':[{author:'The Combine',av:'TC',text:'Trash talk is officially open. First bad take is on record forever.',time:'Apr 3 2026',rx:{'😂':5,'🔥':3}}],
-  'draft-room':[{author:'The Combine',av:'TC',text:'Startup draft: snake format, random lottery order. Use the Trade Block tab to post your needs.',time:'Apr 3 2026',rx:{'📋':2}}],
+  trades:[{author:'The Combine',av:'TC',text:'Trade block is open. Post your available players and picks in the Trade Block tab.',time:'Apr 3 2026',rx:{'🔄':2}}],
+  'waiver-wire':[{author:'The Combine',av:'TC',text:'FAAB starts at $100. Resets at training camp and offseason. Blind bids — highest wins.',time:'Apr 3 2026',rx:{'📈':2}}],
+  commissioner:[{author:'The Combine',av:'TC',text:'All official rulings and announcements will be posted here. Check the Commissioner tab for the full record.',time:'Apr 3 2026',rx:{'⚖️':3}}],
 };
 
 let ach='general', bdat={};
@@ -1404,19 +1500,64 @@ function switchCh(id){
 function renderMsgs(){
   const msgs=(bdat[ach]||[]);
   const el=document.getElementById('msgs');
+  const me=currentUser?currentUser.team_name:(vname||localStorage.getItem('combine_voter')||'');
   el.innerHTML=msgs.length===0
     ?`<div style="color:var(--muted);text-align:center;padding:30px;font-style:italic;font-size:13px">No messages yet. Break the ice.</div>`
-    :msgs.map((m,i)=>`<div class="mw">
+    :msgs.map((m,i)=>{
+      const isMe=me&&m.author===me;
+      const editing=m._editing;
+      return `<div class="mw" id="msg-${i}">
         <div class="mav">${m.av||m.author[0]}</div>
-        <div style="flex:1;min-width:0"><span class="mauth">${m.author}</span><span class="mtime">${m.time}</span>
-          <div class="mtxt">${m.text}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span class="mauth">${m.author}</span><span class="mtime">${m.time}</span>
+            ${m._edited?'<span style="font-size:10px;color:var(--muted);font-style:italic">(edited)</span>':''}
+            ${isMe?`<span style="margin-left:auto;display:flex;gap:4px">
+              <button class="abt" title="Edit" onclick="startEditMsg(${i})">✏️</button>
+              <button class="abt" title="Delete" onclick="deleteMsg(${i})">🗑️</button>
+            </span>`:''}
+          </div>
+          ${editing
+            ? `<div style="display:flex;gap:6px;margin-top:5px">
+                <textarea id="edit-inp-${i}" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--bdra);border-radius:6px;padding:7px 10px;color:var(--bone);font-size:13px;resize:none;outline:none;min-height:38px">${m.text}</textarea>
+                <button class="btn ba2 bsm" onclick="saveEditMsg(${i})">Save</button>
+                <button class="btn bg2 bsm" onclick="cancelEditMsg(${i})">✕</button>
+              </div>`
+            : `<div class="mtxt">${m.text}</div>`}
           <div class="rxr">
             ${Object.entries(m.rx||{}).map(([e,n])=>`<button class="rb2" onclick="addRx(${i},'${e}')">${e} ${n}</button>`).join('')}
             ${['👍','😂','🔥','💀','🎯'].map(e=>`<button class="rb2" onclick="addRx(${i},'${e}')">${e}</button>`).join('')}
           </div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   el.scrollTop=el.scrollHeight;
+}
+
+function startEditMsg(i){
+  if(!bdat[ach]?.[i]) return;
+  bdat[ach][i]._editing=true;
+  renderMsgs();
+  // Focus the textarea
+  setTimeout(()=>{ const t=document.getElementById(`edit-inp-${i}`); if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);} },50);
+}
+function cancelEditMsg(i){
+  if(bdat[ach]?.[i]) { delete bdat[ach][i]._editing; renderMsgs(); }
+}
+async function saveEditMsg(i){
+  const inp=document.getElementById(`edit-inp-${i}`);
+  if(!inp||!bdat[ach]?.[i]) return;
+  const newText=inp.value.trim(); if(!newText) return;
+  bdat[ach][i].text=newText;
+  bdat[ach][i]._edited=true;
+  delete bdat[ach][i]._editing;
+  await DB.set('messages',bdat); renderMsgs();
+}
+async function deleteMsg(i){
+  if(!bdat[ach]?.[i]) return;
+  if(!confirm('Delete this message?')) return;
+  bdat[ach].splice(i,1);
+  await DB.set('messages',bdat); renderMsgs();
 }
 
 async function addRx(idx,emoji){
@@ -1554,19 +1695,6 @@ function shareR(mid){
 }
 
 // ═══ TROPHIES ════════════════════════════════
-function renderTrophies(){
-  const f=document.getElementById('trf').value; let d=DB.get('trophies',[]);
-  if(f!=='all') d=d.filter(t=>t.s===f);
-  document.getElementById('tg').innerHTML=d.length===0
-    ?`<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:13px">No awards yet. Complete a season to add them.</div>`
-    :d.map((t,i)=>`<div class="tc"><div class="tci">${t.ic||'🏆'}</div><div class="taw">${t.a} · ${t.s}</div><div class="twn">${t.w}</div>${t.n?`<div class="tnt">${t.n}</div>`:''}<div style="margin-top:9px"><button class="btn bg2 bsm" onclick="delTrophy(${i})">Remove</button></div></div>`).join('');
-}
-async function saveTrophy(){
-  const d=DB.get('trophies',[]);
-  d.unshift({s:document.getElementById('trs').value.trim(),a:document.getElementById('tra').value.trim(),w:document.getElementById('trw2').value.trim(),ic:document.getElementById('tri').value||'🏆',n:document.getElementById('trn').value.trim(),ts:Date.now()});
-  await DB.set('trophies',d); closeM('trm'); renderTrophies(); toast('Award added.');
-}
-async function delTrophy(i){ if(!confirm('Remove?'))return; const d=DB.get('trophies',[]); d.splice(i,1); await DB.set('trophies',d); renderTrophies(); }
 
 // ═══ TRADE BLOCK ═════════════════════════════
 // Each entry: { roster_id, team_name, owner_name, players:[], picks:[], wants:[], note, ts }
@@ -1712,7 +1840,13 @@ async function closeRuling(i){ const d=DB.get('rulings',[]); d[i].status='closed
 async function delRuling(i){ if(!confirm('Remove?'))return; const d=DB.get('rulings',[]); d.splice(i,1); await DB.set('rulings',d); renderRulings(); }
 
 // ═══ CHARTER UPLOAD ══════════════════════════
-function renderCharter(){
+async function renderCharter(){
+  // Pull charter data from KV if not in localStorage
+  const localData=localStorage.getItem('combine_charter_data');
+  if(!localData){
+    const kvData=DB.get('charter_data',null);
+    if(kvData) localStorage.setItem('combine_charter_data',kvData);
+  }
   const meta=DB.get('charter_meta',null);
   const el=document.getElementById('charter-content');
   if(meta){
@@ -1741,9 +1875,10 @@ function uploadCharter(e){
   reader.onload=async(ev)=>{
     const b64=ev.target.result;
     localStorage.setItem('combine_charter_data',b64);
+    await DB.set('charter_data',b64);
     const meta={name:file.name,size:file.size,type:file.type,ts:Date.now()};
     await DB.set('charter_meta',meta);
-    renderCharter(); toast('Charter uploaded!');
+    renderCharter(); toast('Charter uploaded and synced!');
   };
   reader.readAsDataURL(file);
 }
@@ -1758,7 +1893,8 @@ function downloadCharter(){
 function removeCharter(){
   if(!confirm('Remove the charter?')) return;
   localStorage.removeItem('combine_charter_data');
-  DB.set('charter_meta',null); renderCharter(); toast('Charter removed.');
+  await DB.set('charter_data',null);
+  await DB.set('charter_meta',null); renderCharter(); toast('Charter removed.');
 }
 
 // Drag & drop support
@@ -1853,9 +1989,411 @@ function populateSmackDropdowns(){
   });
 }
 
-// ═══ INIT ════════════════════════════════════
+// ═══ HOME PAGE ══════════════════════════════
+const TAB_DESCRIPTIONS = {
+  survey:     {icon:'📋', label:'Survey',        desc:'Cast your vote on all open league questions. Results update live as members respond.'},
+  roster:     {icon:'👥', label:'Roster',         desc:'Full owner directory with contact info and payment status for all three years.'},
+  info:       {icon:'📜', label:'League Info',    desc:'Charter summary, payout table, season history, and the FAAB penalty log.'},
+  board:      {icon:'💬', label:'Board',          desc:'League message board with channels for general chat, trades, and waiver talk.'},
+  standings:  {icon:'📊', label:'Standings',      desc:'Live W/L standings, points for/against, power rankings, and AI commentary pulled from Sleeper.'},
+  picks:      {icon:'📋', label:'Draft Picks',     desc:'Full rookie draft pick ownership grid — see who owns what pick in every year, including all traded picks.'},
+  roast:      {icon:'🔥', label:'Weekly Roast',   desc:'AI-powered matchup commentary — pull any week from Sleeper and generate recaps or roasts.'}
+  office:     {icon:'⚖️', label:'Commissioner',   desc:'Official rulings, decisions, and appeals — the public record of commissioner actions.'},
+  tradeblock: {icon:'🔄', label:'Trade Block',    desc:'Post players and picks you're willing to move. Log in as your team to manage your listing.'}
+  charter:    {icon:'📄', label:'Charter',        desc:'Upload and download the official league charter. Always available for reference.'},
+};
+
+const HOME_FACTS = [
+  ['Commissioner',    'Rob Kunka'],
+  ['Platform',        'Sleeper'],
+  ['Format',          'Dynasty — perpetual rosters, no re-draft'],
+  ['Scoring',         'Full PPR + 0.5 TEP (tight end premium)'],
+  ['Teams',           '12–14 (confirmed before startup draft)'],
+  ['Annual Fee',      'CAD $55 ($50 base + $5 operational)'],
+  ['Inaugural',       'CAD $110 — two years upfront required to join'],
+  ['Payment',         'E-Transfer to rkunka31@gmail.com'],
+  ['Startup Draft',   'Snake format · random lottery order · 24-hr clock'],
+  ['Rookie Draft',    '3 rounds · linear MaxPF order'],
+  ['FAAB',            'CAD $100 · resets training camp + offseason'],
+  ['Prizes',          '50% champion · 25% runner-up · 15% 3rd · 10% reg. season winner'],
+];
+
+function renderHome(){
+  const vis = getTabVis();
+
+  // Tab guide — only show visible tabs
+  const guide = document.getElementById('home-tab-guide');
+  if(!guide) return;
+  guide.innerHTML = Object.entries(TAB_DESCRIPTIONS)
+    .filter(([key]) => vis[key] !== false)
+    .map(([key, t]) => `
+      <div class="card" style="padding:14px 16px;cursor:pointer;transition:border-color .2s"
+           onclick="switchTab('${key}')"
+           onmouseover="this.style.borderColor='var(--acc)'"
+           onmouseout="this.style.borderColor=''">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px">
+          <span style="font-size:18px">${t.icon}</span>
+          <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--acc);letter-spacing:1px;text-transform:uppercase">${t.label}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">${t.desc}</div>
+      </div>`).join('');
+
+  // League facts table
+  const facts = document.getElementById('home-facts');
+  if(facts){
+    facts.innerHTML = HOME_FACTS.map(([k,v], i) => `
+      <tr style="background:${i%2===0?'transparent':'rgba(255,255,255,.02)'}">
+        <td style="padding:9px 14px;font-size:12px;font-weight:600;color:var(--acc);font-family:var(--mono);white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);width:35%">${k}</td>
+        <td style="padding:9px 14px;font-size:13px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04)">${v}</td>
+      </tr>`).join('');
+  }
+}
+
+// ═══ SURVEY RESULTS DASHBOARD ═══════════════
+function renderSurveyResults(){
+  const el = document.getElementById('survey-results-dash');
+  if(!el) return;
+
+  const all = DB.get('votes', {});
+  const voters = Object.keys(all).filter(k => k !== '_meta');
+
+  if(!voters.length){
+    el.innerHTML = `<div style="text-align:center;padding:28px;color:var(--muted);font-style:italic;font-size:13px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r)">No votes submitted yet. Share the link with league members to get started.</div>`;
+    return;
+  }
+
+  const threshold = Math.ceil(voters.length * 2 / 3);
+
+  // Tally votes per question
+  const tally = {};
+  voters.forEach(v => {
+    QS.forEach(q => {
+      if(!tally[q.id]) tally[q.id] = {};
+      const ans = all[v][q.id];
+      if(ans !== undefined) tally[q.id][ans] = (tally[q.id][ans]||0) + 1;
+    });
+  });
+
+  // Header summary
+  let html = `
+    <div class="card" style="padding:16px 18px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--bone)">${voters.length} owner${voters.length!==1?'s':''} voted</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">2/3 majority threshold = ${threshold} votes · ${QS.length} questions total</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="bdg bg">✓ Passes</span>
+          <span class="bdg ba">⚠ Review</span>
+          <span class="bdg bm">○ No votes</span>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">Who has voted</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${voters.map(v => {
+          const answered = QS.filter(q => all[v][q.id] !== undefined).length;
+          return `<div style="background:rgba(200,169,110,.08);border:1px solid var(--bdra);border-radius:20px;padding:4px 11px;font-size:12px;color:var(--acc2)">${v} <span style="color:var(--muted)">(${answered}/${QS.length})</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  // Per-question breakdown
+  html += `<div style="display:flex;flex-direction:column;gap:10px">`;
+  QS.forEach((q, qi) => {
+    const t = tally[q.id] || {};
+    const entries = Object.entries(t).sort((a,b) => b[1]-a[1]);
+    const totalAns = Object.values(t).reduce((a,b)=>a+b,0);
+    const leading = entries[0];
+    const passes = leading && leading[1] >= threshold;
+    const noVotes = totalAns === 0;
+
+    const statusBadge = noVotes
+      ? '<span class="bdg bm">○ No votes yet</span>'
+      : passes
+        ? '<span class="bdg bg">✓ Passes</span>'
+        : '<span class="bdg ba">⚠ Needs more votes</span>';
+
+    html += `
+      <div class="card" style="padding:15px 17px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <span style="font-family:var(--mono);font-size:11px;color:var(--acc)">Q${qi+1}</span>
+              <span style="font-size:14px;font-weight:600;color:var(--bone)">${q.t}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted)">${q.s}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        ${q.o.map((opt, oi) => {
+          const count = t[oi] || 0;
+          const pct = totalAns > 0 ? Math.round(count/totalAns*100) : 0;
+          const isLeading = entries[0] && parseInt(entries[0][0]) === oi && count > 0;
+          // who voted for this option
+          const whoVoted = voters.filter(v => all[v][q.id] === oi);
+          return `
+            <div style="margin-bottom:7px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+                <div style="font-size:13px;color:${isLeading?'var(--bone)':'var(--muted)'};font-weight:${isLeading?'600':'400'}">${opt}</div>
+                <div style="font-family:var(--mono);font-size:11px;color:${isLeading?'var(--acc)':'var(--muted)'};white-space:nowrap;margin-left:8px">${count} vote${count!==1?'s':''} · ${pct}%</div>
+              </div>
+              <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:3px">
+                <div style="height:100%;width:${pct}%;background:${isLeading?'var(--acc)':'rgba(143,168,154,.3)'};border-radius:3px;transition:width .4s"></div>
+              </div>
+              ${whoVoted.length ? `<div style="font-size:11px;color:var(--muted)">${whoVoted.join(' · ')}</div>` : ''}
+            </div>`;
+        }).join('')}
+      </div>`;
+  });
+  html += `</div>`;
+
+  el.innerHTML = html;
+}
+
+// ═══ STANDINGS ═══════════════════════════════
+let standingsCache = null;
+
+async function loadStandings(force=false){
+  if(!sleeperLoaded) await loadSleeperBase();
+  if(standingsCache && !force){ renderStandings(standingsCache); return; }
+
+  try{
+    // Rosters already loaded — build standings from them
+    const rows = sleeperRosters.map(r=>{
+      const u = rosterMap[r.roster_id];
+      const s = r.settings||{};
+      const wins   = s.wins||0;
+      const losses = s.losses||0;
+      const ties   = s.ties||0;
+      const pf     = parseFloat(((s.fpts||0)+(s.fpts_decimal||0)/100).toFixed(2));
+      const pa     = parseFloat(((s.fpts_against||0)+(s.fpts_against_decimal||0)/100).toFixed(2));
+      const maxpf  = parseFloat(((s.ppts||0)+(s.ppts_decimal||0)/100).toFixed(2));
+      // Streak from metadata if available
+      const streak = r.metadata?.streak||'';
+      return {
+        roster_id: r.roster_id,
+        team: getTeamName(r.roster_id),
+        owner: getOwnerName(r.roster_id),
+        wins, losses, ties, pf, pa, maxpf, streak,
+        gp: wins+losses+ties
+      };
+    });
+
+    // Sort by wins desc, then PF desc
+    rows.sort((a,b)=> b.wins-a.wins || b.pf-a.pf);
+    standingsCache = rows;
+    renderStandings(rows);
+    document.getElementById('standings-week-info').textContent =
+      `${sleeperRosters.length} teams · ${rows[0]?.gp||0} weeks played`;
+  } catch(e){ console.error('Standings load failed',e); }
+}
+
+function renderStandings(rows){
+  const numPlayoff = rows.length <= 12 ? 6 : 8;
+  const body = document.getElementById('standings-body');
+  if(!body) return;
+
+  body.innerHTML = rows.map((r,i)=>{
+    const rank = i+1;
+    const inPlayoff = rank <= numPlayoff;
+    const onBubble  = rank === numPlayoff+1;
+    const statusBadge = inPlayoff
+      ? `<span class="bdg bg" style="font-size:9px">✓ IN</span>`
+      : onBubble
+        ? `<span class="bdg ba" style="font-size:9px">BUBBLE</span>`
+        : `<span class="bdg bm" style="font-size:9px">OUT</span>`;
+    const streakColor = r.streak.startsWith('W') ? 'var(--em)' : r.streak.startsWith('L') ? '#e05c4b' : 'var(--muted)';
+    return `<tr style="border-left:3px solid ${inPlayoff?'var(--em)':onBubble?'var(--acc)':'transparent'}">
+      <td style="font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center">${rank}</td>
+      <td><div style="font-weight:600;font-size:13px">${r.team}</div><div style="font-size:11px;color:var(--muted)">${r.owner}</div></td>
+      <td style="text-align:center;font-weight:700;color:var(--em)">${r.wins}</td>
+      <td style="text-align:center;color:var(--muted)">${r.losses}</td>
+      <td style="text-align:center;color:var(--muted)">${r.ties||0}</td>
+      <td style="text-align:right;font-family:var(--mono);font-size:12px">${r.pf.toFixed(2)}</td>
+      <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)">${r.pa.toFixed(2)}</td>
+      <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--acc)">${r.maxpf.toFixed(2)}</td>
+      <td style="text-align:center;font-weight:600;color:${streakColor};font-family:var(--mono);font-size:12px">${r.streak||'—'}</td>
+      <td style="text-align:center">${statusBadge}</td>
+    </tr>`;
+  }).join('');
+
+  // Power rankings (by MaxPF)
+  const byMaxPF = [...rows].sort((a,b)=>b.maxpf-a.maxpf);
+  const weeksPlayed = rows[0]?.gp||1;
+  const powerBody = document.getElementById('power-body');
+  if(powerBody){
+    powerBody.innerHTML = byMaxPF.map((r,i)=>{
+      // Rookie draft pos = inverse MaxPF among non-playoff teams
+      const nonPlayoff = byMaxPF.filter((_,j)=>j>=numPlayoff);
+      const npIdx = nonPlayoff.findIndex(x=>x.roster_id===r.roster_id);
+      const draftPos = npIdx>=0 ? `Pick ${npIdx+1}` : `Playoff`;
+      return `<tr>
+        <td style="text-align:center;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--acc)">${i+1}</td>
+        <td><div style="font-weight:600;font-size:13px">${r.team}</div><div style="font-size:11px;color:var(--muted)">${r.wins}-${r.losses}</div></td>
+        <td style="text-align:right;font-family:var(--mono);font-size:13px;color:var(--acc)">${r.maxpf.toFixed(2)}</td>
+        <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)">${weeksPlayed>0?(r.maxpf/weeksPlayed).toFixed(2):'—'}</td>
+        <td style="text-align:center;font-size:12px;color:${draftPos==='Playoff'?'var(--em)':'var(--muted)'}">${draftPos}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+async function genStandingsComment(){
+  if(!standingsCache||!standingsCache.length){ toast('Load standings first.'); return; }
+  const box = document.getElementById('standings-ai');
+  box.style.display='block';
+  box.textContent='Generating…';
+
+  const top3 = standingsCache.slice(0,3).map(r=>`${r.team} (${r.wins}-${r.losses}, ${r.pf.toFixed(1)} PF)`).join(', ');
+  const bottom = standingsCache[standingsCache.length-1];
+  const bubble = standingsCache[Math.floor(standingsCache.length/2)];
+  const maxPFLeader = [...standingsCache].sort((a,b)=>b.maxpf-a.maxpf)[0];
+
+  const prompt = `You are the snarky but insightful analyst for The Combine dynasty fantasy football league. Write 3-4 sentences of sharp weekly commentary on the current standings. Top of table: ${top3}. MaxPF leader (best roster): ${maxPFLeader.team} (${maxPFLeader.maxpf.toFixed(1)}). On the bubble: ${bubble.team} (${bubble.wins}-${bubble.losses}). Bottom: ${bottom.team} (${bottom.wins}-${bottom.losses}, ${bottom.pf.toFixed(1)} PF). Reference specific teams and numbers. Be direct, vary the commentary style each time.`;
+
+  try{
+    const text = await aiCall('You are a sharp, witty dynasty fantasy football analyst. Deliver insightful commentary using the exact numbers provided. Vary structure and tone each time. Under 100 words.', prompt);
+    box.textContent = text || 'No commentary generated.';
+  } catch{
+    box.textContent = `${top3} are setting the pace. The race for the playoffs is heating up.`;
+  }
+}
+
+// ═══ DRAFT PICK TRACKER ══════════════════════════════
+let picksCache = null;
+const PICK_YEARS = [2026, 2027, 2028];
+const PICK_ROUNDS = [1, 2, 3];
+
+async function loadPickTracker(force=false){
+  if(!sleeperLoaded) await loadSleeperBase();
+  const el = document.getElementById('pick-tracker-content');
+  if(!el) return;
+
+  if(picksCache && !force){ renderPickTracker(picksCache.traded, picksCache.rosters); return; }
+
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div class="spin" style="margin:0 auto 12px"></div>Loading from Sleeper…</div>';
+
+  try{
+    const res = await fetch(`https://api.sleeper.app/v1/league/${LEAGUE_ID}/traded_picks`);
+    const traded = await res.json();
+    picksCache = { traded, rosters: sleeperRosters };
+    renderPickTracker(traded, sleeperRosters);
+  } catch(e){
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Could not load pick data from Sleeper. Try refreshing.</div>';
+  }
+}
+
+function renderPickTracker(tradedPicks, rosters){
+  const el = document.getElementById('pick-tracker-content');
+  if(!el) return;
+
+  // Build a map: year → round → roster_id → owner_roster_id
+  // Start with every team owning their own picks
+  const pickMap = {};
+  PICK_YEARS.forEach(yr=>{
+    pickMap[yr]={};
+    PICK_ROUNDS.forEach(rd=>{
+      pickMap[yr][rd]={};
+      rosters.forEach(r=>{ pickMap[yr][rd][r.roster_id] = r.roster_id; }); // owns their own
+    });
+  });
+
+  // Apply trades — each entry has {season, round, roster_id (original team), previous_owner_id, owner_id (current)}
+  (tradedPicks||[]).forEach(p=>{
+    const yr = parseInt(p.season);
+    const rd = p.round;
+    const orig = p.roster_id;      // whose pick it originally was
+    const curr = p.owner_id;       // who owns it now
+    if(pickMap[yr]?.[rd]?.[orig] !== undefined){
+      pickMap[yr][rd][orig] = curr;
+    }
+  });
+
+  // Render year by year
+  let html = '';
+  PICK_YEARS.forEach(yr=>{
+    html += `<div style="margin-bottom:24px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:10px">${yr} Rookie Draft</div>
+      <div class="card tbl-wrap">
+        <table class="rtbl" style="min-width:500px">
+          <thead><tr>
+            <th>Original Team</th>
+            ${PICK_ROUNDS.map(rd=>`<th style="text-align:center">Round ${rd}</th>`).join('')}
+          </tr></thead>
+          <tbody>`;
+
+    // Sort rosters by team name for readability
+    const sorted = [...rosters].sort((a,b)=>getTeamName(a.roster_id).localeCompare(getTeamName(b.roster_id)));
+
+    sorted.forEach(r=>{
+      html += `<tr>
+        <td style="font-weight:600;font-size:13px">${getTeamName(r.roster_id)}<div style="font-size:11px;color:var(--muted);font-weight:400">${getOwnerName(r.roster_id)}</div></td>`;
+      PICK_ROUNDS.forEach(rd=>{
+        const owner = pickMap[yr]?.[rd]?.[r.roster_id];
+        const isOwn = owner === r.roster_id;
+        const ownerName = isOwn ? '—' : getTeamName(owner);
+        const ownerShort = isOwn ? '' : getOwnerName(owner);
+        if(isOwn){
+          html += `<td style="text-align:center"><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Own</span></td>`;
+        } else {
+          html += `<td style="text-align:center;background:rgba(200,169,110,.08)">
+            <div style="font-size:12px;font-weight:600;color:var(--acc)">${ownerName}</div>
+            <div style="font-size:10px;color:var(--muted)">${ownerShort}</div>
+          </td>`;
+        }
+      });
+      html += '</tr>';
+    });
+
+    html += `</tbody></table></div>`;
+
+    // Summary row — who has the most picks this year
+    const pickCounts = {};
+    rosters.forEach(r=>{ pickCounts[r.roster_id]=0; });
+    PICK_ROUNDS.forEach(rd=>{
+      rosters.forEach(r=>{
+        const owner = pickMap[yr]?.[rd]?.[r.roster_id];
+        if(owner !== undefined) pickCounts[owner]=(pickCounts[owner]||0)+1;
+      });
+    });
+    const sorted2 = Object.entries(pickCounts).sort((a,b)=>b[1]-a[1]).filter(([,v])=>v>0);
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;margin-bottom:4px">`;
+    sorted2.forEach(([rid,cnt])=>{
+      const own = parseInt(rid);
+      const base = rosters.length; // max picks = rounds
+      const extra = cnt > PICK_ROUNDS.length;
+      html += `<div style="background:rgba(${extra?'200,169,110':'143,168,154'},.1);border:1px solid rgba(${extra?'200,169,110':'143,168,154'},.25);border-radius:20px;padding:3px 10px;font-size:11px;color:${extra?'var(--acc)':'var(--muted)'}">
+        ${getTeamName(own)}: ${cnt} pick${cnt!==1?'s':''} ${extra?'⭐':''}
+      </div>`;
+    });
+    html += '</div></div>';
+  });
+
+  // Traded picks log
+  const recent = (tradedPicks||[]).slice(-10).reverse();
+  if(recent.length){
+    html += `<div style="margin-top:8px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:10px">Recent Pick Trades</div>
+      <div class="card" style="padding:14px 16px">
+        ${recent.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);color:var(--acc);font-size:11px;white-space:nowrap">${p.season} Rd ${p.round}</span>
+          <span style="color:var(--muted)">Originally:</span>
+          <span style="font-weight:600">${getTeamName(p.roster_id)}</span>
+          <span style="color:var(--muted)">→ Now owned by:</span>
+          <span style="font-weight:600;color:var(--acc2)">${getTeamName(p.owner_id)}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = html || '<div style="text-align:center;padding:32px;color:var(--muted)">No pick trades on record yet. All teams own their original picks.</div>';
+}
+
+// ═══ INIT ════════════════════════════════════════════
 updateUserPill();
 applyTabVisibility();
+renderHome();
+renderSurveyResults();
 renderRoster();
 if(adminUnlocked){ document.getElementById('admin-code-section').style.display='none'; document.getElementById('admin-controls').style.display='block'; renderAdmin(); }
 loadSleeperBase().then(()=>{ updateUserPill(); populateSmackDropdowns(); setSy(WORKER_URL?'ok':''); });
