@@ -465,7 +465,7 @@ main{position:relative;z-index:1}
     <div style="margin-top:28px">
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <span>Survey Results</span>
-        <button class="btn bg2 bsm" onclick="renderSurveyResults()">🔄 Refresh</button>
+        <button class="btn bg2 bsm" onclick="renderSurveyResults()">🔄 Refresh Results</button>
       </div>
       <div id="survey-results-dash"></div>
     </div>
@@ -1152,7 +1152,9 @@ function switchTab(t){
   if(t==='home') renderHome();
   if(t==='standings') loadStandings();
   if(t==='picks') loadPickTracker();
-  if(t==='survey') renderSurveyResults();
+  if(t==='survey'){
+    renderSurveyResults();
+  }
   if(t==='roster') renderRoster();
   if(t==='board') initBoard();
   if(t==='roast') initRoast();
@@ -1420,10 +1422,21 @@ function updProg(){
 }
 
 async function submitSurvey(){
-  const all=DB.get('votes',{}); all[vname]={...myans,ts:Date.now()};
-  await DB.set('votes',all);
+  // Always fetch latest votes from KV before merging — prevents overwriting other members' votes
+  let all = {};
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=votes');
+      if(r.ok){ const d = await r.json(); if(d.value) all = d.value; }
+    }catch{}
+  }
+  // Merge with local votes in case KV is ahead or behind
+  const local = DB.get('votes', {});
+  Object.assign(all, local);
+  // Add this voter's answers
+  all[vname] = {...myans, ts:Date.now()};
+  await DB.set('votes', all);
   toast('Votes submitted!');
-  // Hide the question form, show only results
   document.getElementById('sbody').style.display='none';
   document.getElementById('sg').style.display='none';
   renderSurveyResults();
@@ -2182,9 +2195,25 @@ function renderHome(){
 }
 
 // ═══ SURVEY RESULTS DASHBOARD ═══════════════
-function renderSurveyResults(){
+async function renderSurveyResults(){
   const el = document.getElementById('survey-results-dash');
   if(!el) return;
+
+  // Pull latest votes from KV so we always see everyone's responses
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=votes');
+      if(r.ok){
+        const d = await r.json();
+        if(d.value){
+          // Merge KV votes into localStorage so local is up to date
+          const local = DB.get('votes',{});
+          const merged = {...d.value, ...local};
+          localStorage.setItem('combine_votes', JSON.stringify(merged));
+        }
+      }
+    }catch{}
+  }
 
   const all = DB.get('votes', {});
   const voters = Object.keys(all).filter(k => k !== '_meta');
@@ -2403,7 +2432,16 @@ function toggleSurveyDetails(){
 
 async function deleteMySurvey(voter){
   if(!confirm(`Remove your survey responses? You can re-vote at any time.`)) return;
-  const all = DB.get('votes',{});
+  // Fetch latest from KV first so we don't delete others' votes
+  let all = {};
+  if(WORKER_URL){
+    try{
+      const r = await fetch(WORKER_URL+'/get?key=votes');
+      if(r.ok){ const d = await r.json(); if(d.value) all = d.value; }
+    }catch{}
+  }
+  const local = DB.get('votes',{});
+  Object.assign(all, local);
   delete all[voter];
   await DB.set('votes', all);
   // Also clear local vname so they can re-vote
