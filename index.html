@@ -482,6 +482,7 @@ main{position:relative;z-index:1}
       <button class="btn ba2 bsm" onclick="openM('om')">+ Add Owner</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <button class="btn bg2 bsm" onclick="openM('import-modal')">📋 Paste Import</button>
       <div style="margin-left:auto;display:flex;gap:6px">
         <span class="bdg bg">✓ Paid</span><span class="bdg br">✗ Unpaid</span><span class="bdg ba">~ Pending</span>
       </div>
@@ -511,6 +512,27 @@ main{position:relative;z-index:1}
     </div>
     <input type="hidden" id="feid">
     <div class="mf"><button class="btn bg2" onclick="closeM('om')">Cancel</button><button class="btn ba2" onclick="saveOwner()">Save</button></div>
+  </div>
+</div>
+<div class="ov" id="import-modal">
+  <div class="modal" style="max-width:620px">
+    <h2>Paste Import</h2>
+    <div class="msub">Copy a table from Google Sheets or Google Docs and paste below. Rows are matched to existing owners by team name (Sleeper handle) and updated in place; unmatched rows are added as new owners.</div>
+    <div style="background:rgba(200,169,110,.06);border:1px solid var(--bdra);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8">
+      <strong style="color:var(--acc)">Expected columns (tab-separated, header row optional):</strong><br>
+      Team Name &nbsp;|&nbsp; Owner Real Name &nbsp;|&nbsp; Email &nbsp;|&nbsp; Phone &nbsp;|&nbsp; 2026 &nbsp;|&nbsp; 2027 &nbsp;|&nbsp; 2028<br>
+      <span style="color:var(--muted)">Payment values: yes / paid / ✓ / 1 = Paid &nbsp;·&nbsp; pending / ~ = Pending &nbsp;·&nbsp; blank / no = Unpaid</span>
+    </div>
+    <div class="fld">
+      <label>Paste data here</label>
+      <textarea id="import-paste" rows="10" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bdra);border-radius:6px;padding:9px 11px;color:var(--bone);font-family:var(--mono);font-size:12px;outline:none;resize:vertical;line-height:1.5" placeholder="Paste from Google Sheets / Docs here…"></textarea>
+    </div>
+    <div id="import-preview" style="margin-top:8px"></div>
+    <div class="mf">
+      <button class="btn bg2" onclick="closeM('import-modal');document.getElementById('import-paste').value='';document.getElementById('import-preview').innerHTML='';document.getElementById('import-confirm-btn').style.display='none';_importParsed=[];">Cancel</button>
+      <button class="btn bg2" onclick="previewImport()">Preview</button>
+      <button class="btn ba2" id="import-confirm-btn" style="display:none" onclick="confirmImport()">Import</button>
+    </div>
   </div>
 </div>
 
@@ -1598,6 +1620,61 @@ async function saveOwner(){
 async function delOwner(i){
   if(!confirm('Remove this owner?')) return;
   const r=DB.get('roster',[]); r.splice(i,1); await DB.set('roster',r); renderRoster(); toast('Removed.');
+}
+
+let _importParsed=[];
+function parsePay(v){
+  if(!v) return 'no';
+  const s=v.trim().toLowerCase();
+  if(['yes','paid','✓','1','true'].includes(s)) return 'yes';
+  if(['pending','~','partial'].includes(s)) return 'pending';
+  return 'no';
+}
+function parseImportRows(raw){
+  const rows=raw.trim().split(/\r?\n/).map(r=>r.split('\t'));
+  // Skip header if first cell looks like a label (no sleeper-style name)
+  const HEADER_WORDS=['team','owner','name','email','phone'];
+  const start=HEADER_WORDS.some(w=>rows[0]?.[0]?.toLowerCase().includes(w))?1:0;
+  return rows.slice(start).filter(r=>r[0]?.trim()).map(r=>{
+    const [team='',name='',email='',phone='',p26='',p27='',p28='']=r.map(c=>(c||'').trim());
+    return{team,name,email,phone,pay:{2026:parsePay(p26),2027:parsePay(p27),2028:parsePay(p28)}};
+  });
+}
+function previewImport(){
+  const raw=document.getElementById('import-paste').value;
+  if(!raw.trim()){ document.getElementById('import-preview').innerHTML='<p style="color:var(--muted);font-size:12px">Nothing pasted yet.</p>'; return; }
+  _importParsed=parseImportRows(raw);
+  const roster=DB.get('roster',[]);
+  const rows=_importParsed.map(row=>{
+    const match=roster.find(o=>(o.team||'').toLowerCase()===row.team.toLowerCase()||(o.sleeper_name||'').toLowerCase()===row.team.toLowerCase());
+    const action=match?'<span style="color:var(--acc)">update</span>':'<span style="color:#7fcfaa">add</span>';
+    const ph2=v=>({yes:'✓',pending:'~',no:'✗'})[v]||'✗';
+    return`<tr><td style="font-weight:600">${row.team||'—'}</td><td>${row.name||'—'}</td><td style="color:var(--muted);font-size:11px">${row.email||'—'}</td><td style="text-align:center">${ph2(row.pay[2026])}</td><td style="text-align:center">${ph2(row.pay[2027])}</td><td style="text-align:center">${ph2(row.pay[2028])}</td><td>${action}</td></tr>`;
+  }).join('');
+  document.getElementById('import-preview').innerHTML=`
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">${_importParsed.length} rows parsed</div>
+    <div class="tbl-wrap"><table class="rtbl" style="min-width:0"><thead><tr><th>Team</th><th>Owner</th><th>Email</th><th style="text-align:center">2026</th><th style="text-align:center">2027</th><th style="text-align:center">2028</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  document.getElementById('import-confirm-btn').style.display='inline-flex';
+}
+async function confirmImport(){
+  const roster=DB.get('roster',[]);
+  const count=_importParsed.length;
+  _importParsed.forEach(row=>{
+    const idx=roster.findIndex(o=>(o.team||'').toLowerCase()===row.team.toLowerCase()||(o.sleeper_name||'').toLowerCase()===row.team.toLowerCase());
+    if(idx>=0){
+      roster[idx]={...roster[idx],...(row.name?{name:row.name}:{}),...(row.email?{email:row.email}:{}),...(row.phone?{phone:row.phone}:{}),pay:{...roster[idx].pay,...row.pay}};
+    } else {
+      roster.push(row);
+    }
+  });
+  await DB.set('roster',roster);
+  closeM('import-modal');
+  document.getElementById('import-paste').value='';
+  document.getElementById('import-preview').innerHTML='';
+  document.getElementById('import-confirm-btn').style.display='none';
+  _importParsed=[];
+  renderRoster();
+  toast(`Imported ${count} rows.`);
 }
 
 function renderFeeTable(){
