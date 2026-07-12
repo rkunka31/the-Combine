@@ -1,4 +1,5 @@
 (()=>{
+window.status=function(type,label){const el=document.querySelector('#live-status');if(!el)return;el.className=`live-status ${type||''}`;const text=el.querySelector('span');if(text)text.textContent=label||'';};
 const DATA=window.COMBINE_CHARTER;if(!DATA)return;
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let activeTab='overview',query='',bookmarks=new Set(JSON.parse(localStorage.getItem('combine_charter_bookmarks')||'[]'));
@@ -25,4 +26,5 @@ function openSection(id,push=false){const s=DATA.sections.find(x=>x.id===id);if(
 function shell(){const copy=$('#charter-copy'),nav=$('#charter-nav');if(!copy||!nav)return;const meta=DATA.meta.map(([k,v])=>`<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join('');nav.outerHTML=`<aside class="panel charter-sidebar" id="charter-nav"><div class="charter-search-wrap"><label for="charter-search">Search charter</label><input id="charter-search" class="control" type="search" placeholder="Search rules, fees, trades..."><span id="charter-search-count"></span></div><nav class="charter-toc" id="charter-toc"></nav></aside>`;copy.outerHTML=`<article class="charter-main" id="charter-copy"><section class="panel charter-cover"><p class="kicker">OFFICIAL LEAGUE CHARTER</p><h2>${esc(DATA.title)}</h2><p>${esc(DATA.subtitle)}</p><div class="charter-cover-meta">${meta}</div><div class="charter-version">Version ${esc(DATA.version)} · Effective ${esc(DATA.effective)}</div></section><div class="charter-tabs" id="charter-tabs"></div><div id="charter-sections"></div></article>`;const input=$('#charter-search');input.addEventListener('input',()=>{query=input.value.trim();const matches=DATA.sections.filter(s=>normalize(sectionText(s)).includes(normalize(query))).length;$('#charter-search-count').textContent=query?`${matches} section${matches===1?'':'s'}`:'';render();});render();}
 window.charter=function(){shell();};
 document.addEventListener('DOMContentLoaded',()=>{const h=location.hash.slice(1);if(h.startsWith('charter-section-')||h.startsWith('charter-appendix-')){if(window.show)show('charter');setTimeout(()=>openSection(h.replace(/^charter-/,'')),0);}});
+setTimeout(()=>{if(typeof window.load==='function')window.load();},0);
 })();
