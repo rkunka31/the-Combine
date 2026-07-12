@@ -28,3 +28,4 @@ window.charter=function(){shell();};
 document.addEventListener('DOMContentLoaded',()=>{const h=location.hash.slice(1);if(h.startsWith('charter-section-')||h.startsWith('charter-appendix-')){if(window.show)show('charter');setTimeout(()=>openSection(h.replace(/^charter-/,'')),0);}});
 setTimeout(()=>{if(typeof window.load==='function')window.load();},0);
 })();
+const combineEnhancements=document.createElement('script');combineEnhancements.src='enhancements.js?v=20260712b';document.head.appendChild(combineEnhancements);
