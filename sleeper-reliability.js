@@ -3,12 +3,22 @@
   const API_HOST='api.sleeper.app';
   const CACHE_PREFIX='combine:sleeper:';
   const CACHE_TTL=1000*60*60*24*7;
-  const RETRIES=3;
-  const TIMEOUT=9000;
-  let usedCache=false;
+  const RETRIES=2;
+  const TIMEOUT=7000;
+  let snapshotPromise;
+  let source='live';
 
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const cacheKey=url=>CACHE_PREFIX+url;
+
+  function loadSnapshot(){
+    if(!snapshotPromise){
+      snapshotPromise=nativeFetch(`data/sleeper-core.json?v=${Date.now()}`,{cache:'no-store'})
+        .then(r=>r.ok?r.json():null)
+        .catch(()=>null);
+    }
+    return snapshotPromise;
+  }
 
   function save(url,text,status,headers){
     try{
@@ -24,8 +34,7 @@
       if(!raw)return null;
       const item=JSON.parse(raw);
       if(!item?.text||Date.now()-item.savedAt>CACHE_TTL)return null;
-      usedCache=true;
-      window.dispatchEvent(new CustomEvent('combine-sleeper-cache',{detail:{savedAt:item.savedAt}}));
+      source='device cache';
       return new Response(item.text,{status:item.status||200,headers:item.headers||{'content-type':'application/json'}});
     }catch{return null}
   }
@@ -43,6 +52,17 @@
     try{parsed=new URL(url,location.href)}catch{return nativeFetch(input,init)}
     if(parsed.hostname!==API_HOST)return nativeFetch(input,init);
 
+    const path=parsed.pathname.replace(/^\/v1/,'');
+    const snapshot=await loadSnapshot();
+    const snapshotData=snapshot?.endpoints?.[path];
+    if(snapshotData!==undefined){
+      source='synced snapshot';
+      return new Response(JSON.stringify(snapshotData),{
+        status:200,
+        headers:{'content-type':'application/json','x-combine-source':'snapshot'}
+      });
+    }
+
     let lastError;
     for(let attempt=0;attempt<RETRIES;attempt++){
       try{
@@ -55,7 +75,7 @@
         lastError=new Error(`Sleeper ${response.status}`);
         if(response.status<500&&response.status!==429)break;
       }catch(error){lastError=error}
-      if(attempt<RETRIES-1)await sleep(500*Math.pow(2,attempt)+Math.random()*250);
+      if(attempt<RETRIES-1)await sleep(600+Math.random()*300);
     }
 
     const fallback=cached(parsed.href);
@@ -63,10 +83,12 @@
     throw lastError||new Error('Sleeper request failed');
   };
 
-  window.addEventListener('combine-sleeper-cache',()=>{
-    setTimeout(()=>{
+  window.addEventListener('DOMContentLoaded',()=>{
+    setInterval(()=>{
       const el=document.querySelector('#live-status span');
-      if(el&&usedCache)el.textContent='Cached Sleeper data';
-    },100);
+      if(!el)return;
+      if(source==='synced snapshot')el.textContent='Synced Sleeper data';
+      if(source==='device cache')el.textContent='Cached Sleeper data';
+    },1000);
   });
 })();
