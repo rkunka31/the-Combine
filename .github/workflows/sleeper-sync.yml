@@ -1,0 +1,76 @@
+name: Sync Sleeper league data
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sleeper-sync.yml'
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch Sleeper snapshot
+        run: |
+          python - <<'PY'
+          import json, urllib.request, pathlib, datetime
+
+          API = 'https://api.sleeper.app/v1'
+          LEAGUE = '1315912688991227904'
+
+          def get(path):
+              req = urllib.request.Request(API + path, headers={'User-Agent':'The-Combine-League-Hub/1.0'})
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  return json.load(response)
+
+          endpoints = {}
+          core_paths = [
+              f'/league/{LEAGUE}',
+              '/state/nfl',
+              f'/league/{LEAGUE}/users',
+              f'/league/{LEAGUE}/rosters',
+              f'/league/{LEAGUE}/drafts',
+              f'/league/{LEAGUE}/traded_picks',
+          ]
+          for path in core_paths:
+              endpoints[path] = get(path)
+
+          drafts = endpoints.get(f'/league/{LEAGUE}/drafts') or []
+          for draft in drafts:
+              draft_id = draft.get('draft_id')
+              if draft_id:
+                  endpoints[f'/draft/{draft_id}/picks'] = get(f'/draft/{draft_id}/picks')
+
+          rosters = endpoints.get(f'/league/{LEAGUE}/rosters') or []
+          wanted = set()
+          for roster in rosters:
+              wanted.update(str(x) for x in (roster.get('players') or []))
+              wanted.update(str(x) for x in (roster.get('reserve') or []))
+              wanted.update(str(x) for x in (roster.get('taxi') or []))
+          all_players = get('/players/nfl')
+          endpoints['/players/nfl'] = {pid: all_players[pid] for pid in wanted if pid in all_players}
+
+          payload = {
+              'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'league_id': LEAGUE,
+              'endpoints': endpoints,
+          }
+          out = pathlib.Path('data/sleeper-core.json')
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, separators=(',',':')), encoding='utf-8')
+          PY
+      - name: Commit updated snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/sleeper-core.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Refresh Sleeper league snapshot'
+          git push
