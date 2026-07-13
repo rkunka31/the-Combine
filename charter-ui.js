@@ -19,5 +19,3 @@ function shell(){const copy=$('#charter-copy'),nav=$('#charter-nav');if(!copy||!
 window.charter=function(){shell();};
 document.addEventListener('DOMContentLoaded',()=>{const h=location.hash.slice(1);if(h.startsWith('charter-section-')||h.startsWith('charter-appendix-')){if(window.show)show('charter');setTimeout(()=>openSection(h.replace(/^charter-/,'')),0);}});
 })();
-const f2=document.createElement('script');f2.src='features-v2.js?v=20260712c';f2.defer=true;document.head.appendChild(f2);
-const s3=document.createElement('script');s3.src='simplify-v3.js?v=20260712d';s3.defer=true;document.head.appendChild(s3);
