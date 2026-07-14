@@ -32,6 +32,6 @@ window.draftArticle=function(d){
   return `${html}${clockHTML}`;
 };
 if(window.__COMBINE_EDITORIAL__){window.__COMBINE_EDITORIAL__.draftClockHTML=clockHTML;}
-const load=src=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=`${src}?v=20260714c`;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});
-load('dh-values.js').then(()=>load('dh-integration.js')).then(()=>{if(location.hash==='#autopsy'&&typeof window.renderAnalysis==='function')window.renderAnalysis();}).catch(()=>{});
+const load=src=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=`${src}?v=20260714d`;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});
+load('dh-values.js').then(()=>load('dh-integration.js')).then(()=>load('presentation-fix.js')).then(()=>{if(location.hash==='#autopsy'&&typeof window.renderAnalysis==='function')window.renderAnalysis();}).catch(()=>{});
 })();
