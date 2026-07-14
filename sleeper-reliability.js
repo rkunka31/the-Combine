@@ -13,7 +13,7 @@
 
   function loadSnapshot(){
     if(!snapshotPromise){
-      snapshotPromise=nativeFetch(`data/sleeper-core.json?v=${Date.now()}`,{cache:'no-store'})
+      snapshotPromise=nativeFetch(`data/sleeper-core.json?v=20260714-fast`,{cache:'force-cache'})
         .then(r=>r.ok?r.json():null)
         .catch(()=>null);
     }
@@ -53,6 +53,13 @@
     if(parsed.hostname!==API_HOST)return nativeFetch(input,init);
 
     const path=parsed.pathname.replace(/^\/v1/,'');
+
+    // Historical analytics must never delay standings, draft, contacts or commentary.
+    // The analytics page will show preseason mode until a prebuilt stats snapshot is added.
+    if(/^\/stats\/nfl\/regular\/2025\//.test(path)){
+      return new Response('{}',{status:200,headers:{'content-type':'application/json','x-combine-source':'deferred-analytics'}});
+    }
+
     const snapshot=await loadSnapshot();
     const snapshotData=snapshot?.endpoints?.[path];
     if(snapshotData!==undefined){
